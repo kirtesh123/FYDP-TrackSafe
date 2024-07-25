@@ -23,6 +23,11 @@ def format_time(timestamp):
     seconds = int(timestamp % 60)
     return f"{minutes}:{seconds:02}"
 
+def convert_to_seconds(timestr):
+    """Converts a time string 'mm:ss' to total seconds."""
+    minutes, seconds = map(int, timestr.split(':'))
+    return minutes * 60 + seconds
+
 def track_features_webcam(cap, face_cascade, eye_cascade):
     eyes_closed_times = []
     long_head_turn_times = []
@@ -76,11 +81,14 @@ def track_features_webcam(cap, face_cascade, eye_cascade):
     cv2.destroyAllWindows()
     return {'eyes_closed_times': eyes_closed_times, 'long_head_turn_times': long_head_turn_times}
 
+
 def track_features_video(cap, face_cascade, eye_cascade):
     eyes_closed_times = []
     long_head_turn_times = []
     start_time = time.time()
     eyes_last_closed_time = None
+    last_face_seen_time = time.time()  # Initialize with current time
+    head_turn_started = False
 
     while True:
         ret, frame = cap.read()
@@ -96,24 +104,32 @@ def track_features_video(cap, face_cascade, eye_cascade):
         faces = face_cascade.detectMultiScale(enhanced_gray, scaleFactor=1.1, minNeighbors=7, minSize=(50, 50))
         current_time = time.time() - start_time
 
+        if len(faces) == 0:
+            if not head_turn_started:
+                head_turn_started = time.time()  # Start the timer for head turn
+        else:
+            if head_turn_started and (time.time() - head_turn_started > 2):
+                long_head_turn_times.append(format_time(current_time))
+                print(f"Long head turn detected at {format_time(current_time)}")
+            head_turn_started = False  # Reset the timer
+
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-          
+
             face_roi = enhanced_gray[y:y+int(h*0.5), x:x+w]
             eyes = eye_cascade.detectMultiScale(face_roi, scaleFactor=1.05, minNeighbors=10, minSize=(20, 20))
 
             valid_eyes = []
             for (ex, ey, ew, eh) in eyes:
-             
                 aspect_ratio = ew / eh
-                if 0.75 < aspect_ratio < 1.25:  
+                if 0.75 < aspect_ratio < 1.25:
                     valid_eyes.append((ex, ey, ew, eh))
                     cv2.rectangle(frame, (x + ex, y + ey), (x + ex + ew, y + ey + eh), (0, 255, 0), 2)
 
             if len(valid_eyes) < 2:
                 if not eyes_last_closed_time:
                     eyes_last_closed_time = time.time()
-                elif time.time() - eyes_last_closed_time > 2:  
+                elif time.time() - eyes_last_closed_time > 2:
                     eyes_closed_times.append(format_time(current_time))
                     print(f"Eyes closed detected at {format_time(current_time)}")
                     eyes_last_closed_time = None
@@ -121,20 +137,31 @@ def track_features_video(cap, face_cascade, eye_cascade):
                 eyes_last_closed_time = None
 
         cv2.imshow('Face and Eye Detection', frame)
-        if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'): 
-            
+        if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'):
             break
 
     cap.release()
     cv2.destroyAllWindows()
-    return {'eyes_closed_times': eyes_closed_times, 'long_head_turn_times': long_head_turn_times}
 
+
+    cleaned_times = []
+    if eyes_closed_times:
+        # Convert the first time to seconds and initialize the cleaned list
+        last_time = convert_to_seconds(eyes_closed_times[0])
+        cleaned_times.append(eyes_closed_times[0])
+
+        for time_str in eyes_closed_times[1:]:
+            current_time = convert_to_seconds(time_str)
+            if current_time - last_time >= 3.1:  # Ensure there's at least 3 seconds difference
+                cleaned_times.append(time_str)
+                last_time = current_time
+
+    return {'eyes_closed_times': cleaned_times, 'long_head_turn_times': long_head_turn_times}
 
 
 def driverCV():
     face_cascade, eye_cascade = initialize_cascades()
 
-    # Automatically choose Video File mode
     bucket_name = 'fydp-videos'
     file_name = input("Please enter the filename: ")
 
@@ -144,13 +171,14 @@ def driverCV():
     else:
         local_directory = './'
 
-        # Download the video file
+        # Download video
         download_video(bucket_name, file_name, local_directory)
         video_path = os.path.join(local_directory, file_name)
 
         # Check if the download was successful
         if os.path.exists(video_path):
-            cap = configure_camera(video_path)  # Setup the video file as the source
+
+            cap = configure_camera('./test.mp4')  
             session_data = track_features_video(cap, face_cascade, eye_cascade)
     
             # Clean up
