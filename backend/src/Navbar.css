@@ -1,11 +1,28 @@
 .custom-navbar {
-    height: 50px; /* Adjust the height as needed */
-    line-height: 50px;
-  }
-  
-  .custom-navbar .navbar-brand,
-  .custom-navbar .nav-link {
-    height: 50px;
-    line-height: 50px;
-  }
-  
+  height: 50px; /* Adjust the height as needed */
+  line-height: 50px;
+}
+
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link {
+  height: 50px;
+  line-height: 50px;
+}
+
+.custom-nav {
+  display: flex;
+  justify-content: space-between; /* Distribute links evenly */
+  width: 100%; /* Ensure it takes the full width */
+}
+
+.custom-nav .nav-link {
+  flex-grow: 1; /* Allow links to grow evenly */
+  text-align: center; /* Center the text */
+}
+
+.profile-icon {
+  width: 30px;  /* Adjust the width as needed */
+  height: 30px; /* Adjust the height as needed */
+  border-radius: 50%;
+  object-fit: cover; /* Ensure the image covers the element without distortion */
+}
