@@ -11,7 +11,13 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors()); // Enable CORS
+// app.use(cors()); // Enable CORS
+const corsOptions = {
+  origin: 'http://localhost:3000', // Allow only this origin
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions)); // Enable CORS with specific options
 
 // MySQL connection
 const db = mysql.createConnection({
@@ -99,8 +105,42 @@ app.get('/sessions', (req, res) => {
       res.status(500).send('Server error');
       return;
     }
+    console.log('Data fetched from database:', results); // Log the fetched data
     res.json(results);
   });
+});
+
+app.post('/sessions', (req, res) => {
+  try {
+      const data = req.body;
+      console.log('Received data:', JSON.stringify(data, null, 2));
+      if (!Array.isArray(data)) {
+          throw new Error('Input data should be an array of objects');
+      }
+
+      const columns = Object.keys(data[0]).join(', ');
+      const values = data.map(Object.values);
+
+      const placeholders = data.map(() => `(${new Array(Object.keys(data[0]).length).fill('?').join(', ')})`).join(', ');
+
+      const query = `INSERT INTO Sessions (${columns}) VALUES ${placeholders}`;
+
+      console.log('Executing query:', query);
+      console.log('With values:', values.flat());
+
+      db.query(query, values.flat(), (err, results) => {
+          if (err) {
+              console.error('Error executing query:', err);
+              res.status(500).json({ message: 'Server error', error: err.message });
+              return;
+          }
+          console.log('Data inserted into database:', results);
+          res.json(results);
+      });
+  } catch (error) {
+      console.error('Error in POST /sessions:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
 });
 
 app.listen(port, () => {

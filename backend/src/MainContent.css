@@ -1,0 +1,35 @@
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .gauge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .gauge {
+    width: 400px;
+    height: 200px;
+  }
+  
+  .score {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .score-number {
+    font-size: 48px;
+    font-weight: bold;
+  }
+  
+  .score-label {
+    font-size: 24px;
+    color: #666;
+  }
+  
