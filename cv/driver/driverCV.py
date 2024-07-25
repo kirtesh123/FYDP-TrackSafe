@@ -98,22 +98,22 @@ def track_features_video(cap, face_cascade, eye_cascade):
 
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            # Adjusted eye detection ROI to focus on the upper part of the face
+          
             face_roi = enhanced_gray[y:y+int(h*0.5), x:x+w]
             eyes = eye_cascade.detectMultiScale(face_roi, scaleFactor=1.05, minNeighbors=10, minSize=(20, 20))
 
             valid_eyes = []
             for (ex, ey, ew, eh) in eyes:
-                # More stringent aspect ratio check
+             
                 aspect_ratio = ew / eh
-                if 0.75 < aspect_ratio < 1.25:  # More strict aspect ratio for eyes
+                if 0.75 < aspect_ratio < 1.25:  
                     valid_eyes.append((ex, ey, ew, eh))
                     cv2.rectangle(frame, (x + ex, y + ey), (x + ex + ew, y + ey + eh), (0, 255, 0), 2)
 
             if len(valid_eyes) < 2:
                 if not eyes_last_closed_time:
                     eyes_last_closed_time = time.time()
-                elif time.time() - eyes_last_closed_time > 2:  # Reduced time to consider eyes closed
+                elif time.time() - eyes_last_closed_time > 2:  
                     eyes_closed_times.append(format_time(current_time))
                     print(f"Eyes closed detected at {format_time(current_time)}")
                     eyes_last_closed_time = None
@@ -121,7 +121,8 @@ def track_features_video(cap, face_cascade, eye_cascade):
                 eyes_last_closed_time = None
 
         cv2.imshow('Face and Eye Detection', frame)
-        if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'):  # Adjust frame rate to 30 fps
+        if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'): 
+            
             break
 
     cap.release()
@@ -130,8 +131,46 @@ def track_features_video(cap, face_cascade, eye_cascade):
 
 
 
-def main():
+def driverCV():
     face_cascade, eye_cascade = initialize_cascades()
+
+    # Automatically choose Video File mode
+    bucket_name = 'fydp-videos'
+    file_name = input("Please enter the filename: ")
+
+    # Check if the file has a valid .mp4 extension
+    if not file_name.endswith('.mp4'):
+        print("Please enter a filename with a .mp4 extension.")
+    else:
+        local_directory = './'
+
+        # Download the video file
+        download_video(bucket_name, file_name, local_directory)
+        video_path = os.path.join(local_directory, file_name)
+
+        # Check if the download was successful
+        if os.path.exists(video_path):
+            cap = configure_camera(video_path)  # Setup the video file as the source
+            session_data = track_features_video(cap, face_cascade, eye_cascade)
+    
+            # Clean up
+            os.remove(video_path)
+            print("Video file has been deleted after processing.")
+            print(f"Session Data: {session_data}")
+        else:
+            print("Failed to download the video file.")
+            if os.path.exists(video_path):
+                os.remove(video_path)
+
+
+if __name__ == '__main__':
+    driverCV()
+
+
+
+
+
+    '''face_cascade, eye_cascade = initialize_cascades()
     print("Choose the mode: \n1. Webcam \n2. Video File")
     choice = input("Enter your choice (1 or 2): ")
 
@@ -140,19 +179,19 @@ def main():
         session_data = track_features_webcam(cap, face_cascade, eye_cascade)
     elif choice == '2':
         bucket_name = 'fydp-videos'
-        file_name = 'cv_test.mp4'
+        file_name = input("Please enter the filename: ")
         local_directory = './'
         
         # Download video file
         download_video(bucket_name, file_name, local_directory)
         video_path = os.path.join(local_directory, file_name)
 
-        # Check if the download was successful
+        # Check  download 
         if os.path.exists(video_path):
             cap = configure_camera(video_path)
             session_data = track_features_video(cap, face_cascade, eye_cascade)
             
-            # Clean up: remove the video file after processing
+            # Clean up
             os.remove(video_path)
             print("Video file has been deleted after processing.")
         else:
@@ -162,7 +201,4 @@ def main():
         return
 
     print(f"Session Data: {session_data}")
-
-
-if __name__ == '__main__':
-    main()
+    '''
