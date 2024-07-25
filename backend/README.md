@@ -66,6 +66,6 @@ The API used are defined in the `server.js` file, and contains all the API used 
 This API lists the details for all the files currently in the S3 storage bucket. To view it in a browser, use [http://localhost:5000/files](http://localhost:5000/files)
 
 2. GET Method - `/files/:key`\
-This API gets the detials for a specific file from the S# storage bucket, where the `key` parameter is the name of the stored file including the file extension (Eg. test-video.mp4). If the file is not sotred locally, it will download the file and save it in the `my-app/Folders/` directory.
+This API gets the detials for a specific file from the S# storage bucket, where the `key` parameter is the name of the stored file including the file extension (Eg. test-video.mp4). If the file is not sotred locally, it will download the file and save it in the `backend/Folders/` directory.
 
    At the moment, the code within the `FileList.js` file automatically lists all files from S3 by using the fetch method. When the download button is clicked, it downloads the file. This component is added to the main `App.js` file.
