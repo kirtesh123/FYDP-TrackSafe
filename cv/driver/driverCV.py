@@ -162,6 +162,7 @@ def driverCV():
             if os.path.exists(video_path):
                 os.remove(video_path)
 
+    return session_data
 
 if __name__ == '__main__':
     driverCV()
