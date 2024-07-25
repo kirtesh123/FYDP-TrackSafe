@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import time
+import os 
+from video import download_video
 
 def initialize_cascades():
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -137,14 +139,30 @@ def main():
         cap = configure_camera(0)  # Webcam
         session_data = track_features_webcam(cap, face_cascade, eye_cascade)
     elif choice == '2':
-        video_file = input("Enter the path to your video file: ")
-        cap = configure_camera(video_file)
-        session_data = track_features_video(cap, face_cascade, eye_cascade)
+        bucket_name = 'fydp-videos'
+        file_name = 'cv_test.mp4'
+        local_directory = './'
+        
+        # Download video file
+        download_video(bucket_name, file_name, local_directory)
+        video_path = os.path.join(local_directory, file_name)
+
+        # Check if the download was successful
+        if os.path.exists(video_path):
+            cap = configure_camera(video_path)
+            session_data = track_features_video(cap, face_cascade, eye_cascade)
+            
+            # Clean up: remove the video file after processing
+            os.remove(video_path)
+            print("Video file has been deleted after processing.")
+        else:
+            print("Failed to download the video file.")
     else:
         print("Invalid choice.")
         return
 
     print(f"Session Data: {session_data}")
+
 
 if __name__ == '__main__':
     main()
