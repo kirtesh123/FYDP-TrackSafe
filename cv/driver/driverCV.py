@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import time
 import os 
-from video import download_video
+from driver.video import download_video
 
 def initialize_cascades():
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -163,7 +163,7 @@ def driverCV():
     face_cascade, eye_cascade = initialize_cascades()
 
     bucket_name = 'fydp-videos'
-    file_name = input("Please enter the filename: ")
+    file_name = 'driver_test.mp4'
 
     # Check if the file has a valid .mp4 extension
     if not file_name.endswith('.mp4'):
@@ -178,7 +178,7 @@ def driverCV():
         # Check if the download was successful
         if os.path.exists(video_path):
 
-            cap = configure_camera('./test.mp4')  
+            cap = configure_camera(video_path)  
             session_data = track_features_video(cap, face_cascade, eye_cascade)
     
             # Clean up
