@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+const axios = require('axios')
 
 const SQLHandler = () => {
     const [data, setData] = useState([]);
-    const [inputData, setInputData] = useState({ column1: '', column2: '' }); // Adjust based on your table schema
+    const [inputData, setInputData] = useState([]); // Adjust based on your table schema
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -26,17 +27,19 @@ const SQLHandler = () => {
         setLoading(true);
         setError(null);
         try {
-            const parsedData = [JSON.parse(inputData)]; // Parse JSON input
-            console.log('Parsed data:', JSON.stringify(parsedData)); // Log parsed data
-            if (!Array.isArray(parsedData)) {
-                throw new Error('Input data should be an array of objects');
-            }
+            // const parsedData = JSON.parse(inputData); // Parse JSON input
+            const parsedData = {
+                "KeyID": 6,
+                "sessionID":1,
+                "time_started":"08:00:00"
+            };
+            console.log('Parsed data:', parsedData); // Log parsed data
             const response = await fetch('http://localhost:5000/sessions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'text/plain'
                 },
-                body: JSON.stringify(parsedData)
+                body: parsedData
             });
 
             if (!response.ok) {

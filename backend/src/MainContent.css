@@ -1,35 +1,95 @@
 .main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  
-  .gauge-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-  }
-  
-  .gauge {
-    width: 400px;
-    height: 200px;
-  }
-  
-  .score {
-    text-align: center;
-    margin-top: 10px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.gauge {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+}
+
+.score {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.score-number {
+  font-size: 1vw;
+  font-weight: bold;
+}
+
+.score-label {
+  font-size: 2.5vw;
+  color: #666;
+}
+
+.sessions-today {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px 0;
+}
+
+.table {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
   .score-number {
-    font-size: 48px;
-    font-weight: bold;
+    font-size: 32px;
   }
-  
+
   .score-label {
-    font-size: 24px;
-    color: #666;
+    font-size: 18px;
   }
-  
+
+  .table {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .score-number {
+    font-size: 12px;
+  }
+
+  .score-label {
+    font-size: 16px;
+  }
+
+  .table {
+    font-size: 12px;
+  }
+}
+
+.pagination-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.see-more-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.see-more-button:hover {
+  background-color: #0056b3;
+}

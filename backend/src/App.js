@@ -3,7 +3,6 @@ import './App.css';
 import NavigationBar from './Navbar';
 import MainContent from './MainContent';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import SQLHandler from './SQLHandler';
 
 function App() {
   return (
@@ -12,9 +11,6 @@ function App() {
       <main>
         <MainContent />
       </main>
-
-      <SQLHandler />
-
     </div>
   );
 }
