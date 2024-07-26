@@ -44,7 +44,7 @@ AWS.config.update({
 });
 
 const s3 = new AWS.S3();
-const bucketName = process.env.S3_BUCKET_NAME;
+// const bucketName = process.env.S3_BUCKET_NAME;
 
 const filesDir = path.join(__dirname, 'Files');
 
@@ -57,7 +57,23 @@ if (!fs.existsSync(filesDir)) {
 
 // Endpoint to list files
 app.get('/files', async (req, res) => {
+  let bucketName = '';
   try {
+    let bucket = req.query.bucket;
+    switch (bucket) {
+      case 'driver' : 
+        bucketName = process.env.S3_BUCKET_NAME_DRIVER;
+        break;
+      case 'road' : 
+        bucketName = process.env.S3_BUCKET_NAME_ROAD;
+        break;
+      case 'data' : 
+        bucketName = process.env.S3_BUCKET_NAME_DATA;
+        break;
+      default : 
+        bucketName = '';
+        break; 
+    }
     const params = {
       Bucket: bucketName,
     };
@@ -77,6 +93,21 @@ app.get('/files/:key', async (req, res) => {
     console.log('File already present');
     res.send('File already present');
   } else {
+    let bucket = req.query.bucket;
+    switch (bucket) {
+      case 'driver' : 
+        bucketName = process.env.S3_BUCKET_NAME_DRIVER;
+        break;
+      case 'road' : 
+        bucketName = process.env.S3_BUCKET_NAME_ROAD;
+        break;
+      case 'data' : 
+        bucketName = process.env.S3_BUCKET_NAME_DATA;
+        break;
+      default : 
+        bucketName = '';
+        break; 
+    }
     const params = {
       Bucket: bucketName,
       Key: fileKey,
@@ -98,7 +129,40 @@ app.get('/files/:key', async (req, res) => {
 
 // Endpoint to get session data
 app.get('/sessions', (req, res) => {
-  const query = 'SELECT * FROM Sessions';
+  let limit = parseInt(req.query.limit, 10);
+  let offset = parseInt(req.query.offset, 10);
+  let user = parseInt(req.query.user, 10);
+  if (isNaN(user) || user <= 0) {
+    user = null; // Handle invalid or missing limit
+  }
+  if (isNaN(offset) || offset <= 0) {
+    offset = null; // Handle invalid or missing limit
+  }
+  if (isNaN(limit) || limit <= 0) {
+    limit = null; // Handle invalid or missing limit
+  }
+  const basicSelect = 'SELECT * FROM Sessions' + (user?` WHERE KeyID = ${user}`:'');
+  const constraints = (limit?' limit ' + limit:'') + (offset?' offset ' + offset:'');
+  const query = basicSelect + constraints;
+  console.log('Query: ', query);
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Server error');
+      return;
+    }
+    console.log('Data fetched from database:', results); // Log the fetched data
+    res.json(results);
+  });
+});
+
+// Endpoint to get driver data
+app.get('/driver', (req, res) => {
+  let user = parseInt(req.query.user, 10);
+  if (isNaN(user) || user <= 0) {
+    user = null; // Handle invalid or missing limit
+  }
+  const query = 'SELECT * FROM Drivers' + (user?` WHERE KeyID = ${user}`:'');
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error executing query:', err);
@@ -111,36 +175,31 @@ app.get('/sessions', (req, res) => {
 });
 
 app.post('/sessions', (req, res) => {
-  try {
-      const data = req.body;
-      console.log('Received data:', JSON.stringify(data, null, 2));
-      if (!Array.isArray(data)) {
-          throw new Error('Input data should be an array of objects');
+  const data = req.body;
+  console.log('Received data:', data);
+  // if (!Array.isArray(data)) {
+  //     throw new Error('Input data should be an array of objects');
+  // }
+
+  const columns = Object.keys(data[0]).join(', ');
+  const values = data.map(Object.values);
+
+  const placeholders = data.map(() => `(${new Array(Object.keys(data[0]).length).fill('?').join(', ')})`).join(', ');
+
+  const query = `INSERT INTO Sessions (${columns}) VALUES ${placeholders}`;
+
+  console.log('Executing query:', query);
+  console.log('With values:', values.flat());
+
+  db.query(query, values.flat(), (err, results) => {
+      if (err) {
+          console.error('Error executing query:', err);
+          res.status(500).json({ message: 'Server error', error: err.message });
+          return;
       }
-
-      const columns = Object.keys(data[0]).join(', ');
-      const values = data.map(Object.values);
-
-      const placeholders = data.map(() => `(${new Array(Object.keys(data[0]).length).fill('?').join(', ')})`).join(', ');
-
-      const query = `INSERT INTO Sessions (${columns}) VALUES ${placeholders}`;
-
-      console.log('Executing query:', query);
-      console.log('With values:', values.flat());
-
-      db.query(query, values.flat(), (err, results) => {
-          if (err) {
-              console.error('Error executing query:', err);
-              res.status(500).json({ message: 'Server error', error: err.message });
-              return;
-          }
-          console.log('Data inserted into database:', results);
-          res.json(results);
-      });
-  } catch (error) {
-      console.error('Error in POST /sessions:', error);
-      res.status(500).json({ message: 'Server error', error: error.message });
-  }
+      console.log('Data inserted into database:', results);
+      res.json(results);
+  });
 });
 
 app.listen(port, () => {
