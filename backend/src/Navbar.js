@@ -21,6 +21,7 @@ function NavigationBar() {
         <Nav className="mr-auto">
           <Nav.Link href="#home">Home</Nav.Link>
           <Nav.Link href="#link">Link</Nav.Link>
+          <Nav.Link href="/profile">Profile</Nav.Link>
         </Nav>
         <Nav>
           <NavDropdown title={<img src={profileImage} alt="Profile" className="profile-image" />} id="basic-nav-dropdown">
