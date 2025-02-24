@@ -2,17 +2,29 @@ import React, { useState, useEffect } from "react";
 import "./Profile.css";
 
 const Profile = () => {
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    role: "",
+    region: "",
+    carModel: ""
+  });
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    role: "",
+    region: "",
+    carModel: ""
+  });
 
   // Fetch user profile
   useEffect(() => {
-    fetch(`http://localhost:5000/profile?user=1`)
+    fetch(`http://localhost:5000/profile?user=1`) // Consider making user dynamic
       .then((res) => res.json())
       .then((data) => {
-        setProfile(data);
-        setFormData(data);
+        setProfile(data || {}); // Ensure it handles empty responses
+        setFormData(data || {}); // Prevent undefined errors
       })
       .catch((err) => console.error("Error fetching profile:", err));
   }, []);
@@ -25,7 +37,7 @@ const Profile = () => {
   // Save updated profile
   const handleSave = () => {
     fetch("http://localhost:5000/profile", {
-      method: "POST",
+      method: "PUT", // Use PUT if updating an existing profile
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     })
@@ -43,25 +55,41 @@ const Profile = () => {
       <div className="profile-info">
         <label>Name:</label>
         {editMode ? (
-          <input type="text" name="name" value={formData.name} onChange={handleChange} />
+          <input type="text" name="name" value={formData.name || ""} onChange={handleChange} />
         ) : (
-          <p>{profile.name}</p>
+          <p>{profile.name || "N/A"}</p>
         )}
       </div>
       <div className="profile-info">
         <label>Email:</label>
         {editMode ? (
-          <input type="email" name="email" value={formData.email} onChange={handleChange} />
+          <input type="email" name="email" value={formData.email || ""} onChange={handleChange} />
         ) : (
-          <p>{profile.email}</p>
+          <p>{profile.email || "N/A"}</p>
         )}
       </div>
       <div className="profile-info">
         <label>Role:</label>
         {editMode ? (
-          <input type="text" name="role" value={formData.role} onChange={handleChange} />
+          <input type="text" name="role" value={formData.role || ""} onChange={handleChange} />
         ) : (
-          <p>{profile.role}</p>
+          <p>{profile.role || "N/A"}</p>
+        )}
+      </div>
+      <div className="profile-info">
+        <label>Region of Location:</label>
+        {editMode ? (
+          <input type="text" name="region" value={formData.region || ""} onChange={handleChange} />
+        ) : (
+          <p>{profile.region || "N/A"}</p>
+        )}
+      </div>
+      <div className="profile-info">
+        <label>Car Model:</label>
+        {editMode ? (
+          <input type="text" name="carModel" value={formData.carModel || ""} onChange={handleChange} />
+        ) : (
+          <p>{profile.carModel || "N/A"}</p>
         )}
       </div>
       {editMode ? (

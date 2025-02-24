@@ -11,6 +11,20 @@
     text-align: center;
   }
   
+  /* Ensure the cardboard box is square */
+.profile-info.cardboard-box {
+  width: 200px;
+  height: 200px;
+  border: 2px solid #ccc;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 0; /* Ensures a square shape */
+}
+
+
   .profile-info {
     margin: 10px 0;
   }
