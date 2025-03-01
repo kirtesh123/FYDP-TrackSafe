@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
 import time
-import os 
+import os
+import uuid
 from driver.video import download_video
+
 
 def initialize_cascades():
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -11,11 +13,13 @@ def initialize_cascades():
         raise IOError("Failed to load cascade files")
     return face_cascade, eye_cascade
 
+
 def configure_camera(source):
     cap = cv2.VideoCapture(source)
     if not cap.isOpened():
         raise IOError(f"Cannot open source {source}")
     return cap
+
 
 def format_time(timestamp):
     """Converts a timestamp to a formatted string in minutes and seconds."""
@@ -23,11 +27,14 @@ def format_time(timestamp):
     seconds = int(timestamp % 60)
     return f"{minutes}:{seconds:02}"
 
+
 def convert_to_seconds(timestr):
     """Converts a time string 'mm:ss' to total seconds."""
     minutes, seconds = map(int, timestr.split(':'))
     return minutes * 60 + seconds
 
+
+'''
 def track_features_webcam(cap, face_cascade, eye_cascade):
     eyes_closed_times = []
     long_head_turn_times = []
@@ -80,39 +87,44 @@ def track_features_webcam(cap, face_cascade, eye_cascade):
     cap.release()
     cv2.destroyAllWindows()
     return {'eyes_closed_times': eyes_closed_times, 'long_head_turn_times': long_head_turn_times}
+'''
 
 
 def track_features_video(cap, face_cascade, eye_cascade):
     eyes_closed_times = []
     long_head_turn_times = []
+    quit_pressed = False  # Flag to indicate if user pressed "q" to quit.
+   
     start_time = time.time()
     eyes_last_closed_time = None
-    last_face_seen_time = time.time()  # Initialize with current time
+    last_face_seen_time = time.time()  
     head_turn_started = False
 
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("Failed to grab frame")
+            print("Finished")
             break
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         enhanced_gray = clahe.apply(gray)
 
-        # Adjusted face detection for higher accuracy
+        
         faces = face_cascade.detectMultiScale(enhanced_gray, scaleFactor=1.1, minNeighbors=7, minSize=(50, 50))
         current_time = time.time() - start_time
 
+       
         if len(faces) == 0:
             if not head_turn_started:
-                head_turn_started = time.time()  # Start the timer for head turn
+                head_turn_started = time.time()
         else:
             if head_turn_started and (time.time() - head_turn_started > 2):
                 long_head_turn_times.append(format_time(current_time))
                 print(f"Long head turn detected at {format_time(current_time)}")
-            head_turn_started = False  # Reset the timer
+            head_turn_started = False  
 
+        
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
@@ -126,6 +138,7 @@ def track_features_video(cap, face_cascade, eye_cascade):
                     valid_eyes.append((ex, ey, ew, eh))
                     cv2.rectangle(frame, (x + ex, y + ey), (x + ex + ew, y + ey + eh), (0, 255, 0), 2)
 
+         
             if len(valid_eyes) < 2:
                 if not eyes_last_closed_time:
                     eyes_last_closed_time = time.time()
@@ -137,59 +150,71 @@ def track_features_video(cap, face_cascade, eye_cascade):
                 eyes_last_closed_time = None
 
         cv2.imshow('Face and Eye Detection', frame)
+  
         if cv2.waitKey(int(1000/30)) & 0xFF == ord('q'):
+            quit_pressed = True
             break
 
     cap.release()
     cv2.destroyAllWindows()
 
-
+  
     cleaned_times = []
     if eyes_closed_times:
-        # Convert the first time to seconds and initialize the cleaned list
         last_time = convert_to_seconds(eyes_closed_times[0])
         cleaned_times.append(eyes_closed_times[0])
-
         for time_str in eyes_closed_times[1:]:
-            current_time = convert_to_seconds(time_str)
-            if current_time - last_time >= 3.1:  # Ensure there's at least 3 seconds difference
+            current_sec = convert_to_seconds(time_str)
+            if current_sec - last_time >= 3.1:
                 cleaned_times.append(time_str)
-                last_time = current_time
+                last_time = current_sec
 
-    return {'eyes_closed_times': cleaned_times, 'long_head_turn_times': long_head_turn_times}
+    return {
+        'eyes_closed_times': cleaned_times,
+        'long_head_turn_times': long_head_turn_times,
+        'quit': quit_pressed
+    }
 
 
 def driverCV():
     face_cascade, eye_cascade = initialize_cascades()
 
-    bucket_name = 'fydp-videos'
+    bucket_name = 'driver-cam-footage'
     file_name = 'driver_test.mp4'
 
-    # Check if the file has a valid .mp4 extension
+
     if not file_name.endswith('.mp4'):
         print("Please enter a filename with a .mp4 extension.")
     else:
         local_directory = './'
-
-        # Download video
+        # Download video.
         download_video(bucket_name, file_name, local_directory)
         video_path = os.path.join(local_directory, file_name)
 
-        # Check if the download was successful
+     
         if os.path.exists(video_path):
-
-            cap = configure_camera(video_path)  
+            cap = configure_camera(video_path)
+            processing_start = time.time()  
             session_data = track_features_video(cap, face_cascade, eye_cascade)
+            processing_end = time.time()   
     
-            # Clean up
+            # Clean up video file 
             os.remove(video_path)
             print("Video file has been deleted after processing.")
-            print(f"Session Data: {session_data}")
+            print(f"Session Data (before metadata): {session_data}")
         else:
             print("Failed to download the video file.")
             if os.path.exists(video_path):
                 os.remove(video_path)
+            return None
 
+   
+    session_data["session_id"] = str(uuid.uuid4())
+    session_data["key_id"] = str(uuid.uuid4())
+    session_data["time_start"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(processing_start))
+    session_data["time_end"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(processing_end))
+
+    print(f"Session Data (with metadata): {session_data}")
     return session_data
 
 if __name__ == '__main__':
@@ -198,36 +223,35 @@ if __name__ == '__main__':
 
 
 
+'''face_cascade, eye_cascade = initialize_cascades()
+print("Choose the mode: \n1. Webcam \n2. Video File")
+choice = input("Enter your choice (1 or 2): ")
 
-    '''face_cascade, eye_cascade = initialize_cascades()
-    print("Choose the mode: \n1. Webcam \n2. Video File")
-    choice = input("Enter your choice (1 or 2): ")
+if choice == '1':
+    cap = configure_camera(0)  # Webcam
+    session_data = track_features_webcam(cap, face_cascade, eye_cascade)
+elif choice == '2':
+    bucket_name = 'fydp-videos'
+    file_name = input("Please enter the filename: ")
+    local_directory = './'
+    
+    # Download video file
+    download_video(bucket_name, file_name, local_directory)
+    video_path = os.path.join(local_directory, file_name)
 
-    if choice == '1':
-        cap = configure_camera(0)  # Webcam
-        session_data = track_features_webcam(cap, face_cascade, eye_cascade)
-    elif choice == '2':
-        bucket_name = 'fydp-videos'
-        file_name = input("Please enter the filename: ")
-        local_directory = './'
+    # Check  download 
+    if os.path.exists(video_path):
+        cap = configure_camera(video_path)
+        session_data = track_features_video(cap, face_cascade, eye_cascade)
         
-        # Download video file
-        download_video(bucket_name, file_name, local_directory)
-        video_path = os.path.join(local_directory, file_name)
-
-        # Check  download 
-        if os.path.exists(video_path):
-            cap = configure_camera(video_path)
-            session_data = track_features_video(cap, face_cascade, eye_cascade)
-            
-            # Clean up
-            os.remove(video_path)
-            print("Video file has been deleted after processing.")
-        else:
-            print("Failed to download the video file.")
+        # Clean up
+        os.remove(video_path)
+        print("Video file has been deleted after processing.")
     else:
-        print("Invalid choice.")
-        return
+        print("Failed to download the video file.")
+else:
+    print("Invalid choice.")
+    return
 
-    print(f"Session Data: {session_data}")
-    '''
+print(f"Session Data: {session_data}")
+'''
