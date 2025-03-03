@@ -1,4 +1,4 @@
-/* Updated Login.css for modern glassmorphism design */
+/* Responsive Login.css with Bigger, Adaptive Form */
 
 body {
   margin: 0;
@@ -7,7 +7,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: url('Login_bg.jpeg') no-repeat center center/cover;
+  background: url('./Login_bg.jpeg') no-repeat center center/cover;
   font-family: Arial, sans-serif;
 }
 
@@ -21,36 +21,38 @@ body {
 
 .login-form {
   background: rgba(255, 255, 255, 0.1);
-  padding: 30px;
+  padding: 3vw;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   text-align: center;
-  width: 350px;
+  width: 40vw;
+  max-width: 500px;
+  min-width: 300px;
   color: white;
 }
 
 .login-form h2 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
+  font-size: 2vw;
+  margin-bottom: 2vw;
 }
 
 .login-form label {
   display: block;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 1vw;
   margin-bottom: 5px;
   color: white;
 }
 
 .login-form input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
+  padding: 1vw;
+  margin-bottom: 1.5vw;
   border: none;
   border-radius: 5px;
-  font-size: 1rem;
+  font-size: 1vw;
   background: rgba(255, 255, 255, 0.2);
   color: white;
 }
@@ -67,17 +69,17 @@ body {
 .options {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  margin-bottom: 20px;
+  font-size: 0.8vw;
+  margin-bottom: 2vw;
 }
 
 .login-form button {
   width: 100%;
-  padding: 12px;
+  padding: 1.2vw;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1vw;
   font-weight: bold;
   background: rgba(255, 255, 255, 0.3);
   color: white;
@@ -89,12 +91,43 @@ body {
 }
 
 .register-link {
-  font-size: 0.9rem;
-  margin-top: 15px;
+  font-size: 1vw;
+  margin-top: 1.5vw;
   color: white;
   text-decoration: none;
 }
 
 .register-link:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    width: 60vw;
+  }
+  .login-form h2 {
+    font-size: 3vw;
+  }
+  .login-form label,
+  .login-form input,
+  .login-form button,
+  .register-link {
+    font-size: 2vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    width: 80vw;
+    padding: 5vw;
+  }
+  .login-form h2 {
+    font-size: 4vw;
+  }
+  .login-form label,
+  .login-form input,
+  .login-form button,
+  .register-link {
+    font-size: 3vw;
+  }
 }
