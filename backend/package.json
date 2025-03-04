@@ -8,15 +8,17 @@
     "@testing-library/user-event": "^13.5.0",
     "aws-sdk": "^2.1661.0",
     "axios": "^1.7.2",
+    "body-parser": "^1.20.3",
     "bootstrap": "^5.3.3",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "dynamic": "^4.2.2",
-    "express": "^4.18.2",
+    "express": "^4.21.2",
     "fa": "^1.0.1",
     "fs": "^0.0.1-security",
     "is-port-reachable": "^4.0.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
     "next": "^14.2.5",
     "open": "^10.1.0",
@@ -58,5 +60,10 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3"
-  }
+  },
+  "description": "This is a full-stack React application with an Express server. The client and server are both run concurrently for development purposes.",
+  "main": "create-tables.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

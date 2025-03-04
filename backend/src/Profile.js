@@ -1,102 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Profile.css";
 
 const Profile = () => {
-  const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    role: "",
-    region: "",
-    carModel: ""
-  });
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    role: "",
-    region: "",
-    carModel: ""
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch user profile
   useEffect(() => {
-    fetch(`http://localhost:5000/profile?user=1`) // Consider making user dynamic
-      .then((res) => res.json())
-      .then((data) => {
-        setProfile(data || {}); // Ensure it handles empty responses
-        setFormData(data || {}); // Prevent undefined errors
-      })
-      .catch((err) => console.error("Error fetching profile:", err));
+    // Fetch user profile from API
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+        const data = await response.json();
+        setUser(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
-  // Handle input changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Save updated profile
-  const handleSave = () => {
-    fetch("http://localhost:5000/profile", {
-      method: "PUT", // Use PUT if updating an existing profile
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setProfile(formData);
-        setEditMode(false);
-      })
-      .catch((err) => console.error("Error updating profile:", err));
-  };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
     <div className="profile-container">
-      <h1>Profile</h1>
-      <div className="profile-info">
-        <label>Name:</label>
-        {editMode ? (
-          <input type="text" name="name" value={formData.name || ""} onChange={handleChange} />
-        ) : (
-          <p>{profile.name || "N/A"}</p>
-        )}
+      <div className="profile-header">
+        <img src={user.profilePic} alt="Profile" className="profile-pic" />
+        <div className="profile-info">
+          <h2>{user.name}</h2>
+          <p>{user.location}</p>
+          <div className="action-buttons">
+            <button>Chat</button>
+            <button>Call</button>
+            <button>Video Call</button>
+          </div>
+        </div>
       </div>
-      <div className="profile-info">
-        <label>Email:</label>
-        {editMode ? (
-          <input type="email" name="email" value={formData.email || ""} onChange={handleChange} />
-        ) : (
-          <p>{profile.email || "N/A"}</p>
-        )}
+      <div className="profile-content">
+        <div className="summary">
+          <h3>Summary</h3>
+          <p>{user.about}</p>
+          <h4>Certifications</h4>
+          <p>{user.certifications}</p>
+        </div>
+        <div className="car-details">
+          <h3>Car Details</h3>
+          <img src={user.carImage} alt="Car" className="car-image" />
+          <p><strong>Make:</strong> {user.carMake}</p>
+          <p><strong>Model:</strong> {user.carModel}</p>
+          <p><strong>Year:</strong> {user.carYear}</p>
+          <p><strong>License Plate:</strong> {user.carLicensePlate}</p>
+        </div>
       </div>
-      <div className="profile-info">
-        <label>Role:</label>
-        {editMode ? (
-          <input type="text" name="role" value={formData.role || ""} onChange={handleChange} />
-        ) : (
-          <p>{profile.role || "N/A"}</p>
-        )}
+      <div className="reviews">
+        <h3>Reviews</h3>
+        {user.reviews.map((review, index) => (
+          <div key={index} className="review">
+            <p><strong>{review.reviewer}:</strong> {review.comment}</p>
+            <p className="rating">⭐ {review.rating}</p>
+          </div>
+        ))}
       </div>
-      <div className="profile-info">
-        <label>Region of Location:</label>
-        {editMode ? (
-          <input type="text" name="region" value={formData.region || ""} onChange={handleChange} />
-        ) : (
-          <p>{profile.region || "N/A"}</p>
-        )}
-      </div>
-      <div className="profile-info">
-        <label>Car Model:</label>
-        {editMode ? (
-          <input type="text" name="carModel" value={formData.carModel || ""} onChange={handleChange} />
-        ) : (
-          <p>{profile.carModel || "N/A"}</p>
-        )}
-      </div>
-      {editMode ? (
-        <button className="save-button" onClick={handleSave}>Save</button>
-      ) : (
-        <button className="edit-button" onClick={() => setEditMode(true)}>Edit Profile</button>
-      )}
     </div>
   );
 };

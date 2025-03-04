@@ -23,7 +23,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <NavigationBar />
+        {isAuthenticated && <NavigationBar />}
         <main>
           <Routes>
             {/* Main Content on Home */}
