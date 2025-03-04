@@ -11,12 +11,13 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// app.use(cors()); // Enable CORS
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow only this origin
+  origin: '*', //'http://localhost:3000', // Allow only this origin
   optionsSuccessStatus: 200,
 };
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cors(corsOptions)); // Enable CORS with specific options
 
 // MySQL connection
@@ -174,6 +175,7 @@ app.get('/driver', (req, res) => {
   });
 });
 
+// Endpoint to insert new session
 app.post('/sessions', (req, res) => {
   const data = req.body;
   console.log('Received data:', data);
@@ -204,4 +206,123 @@ app.post('/sessions', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+
+
+// Endpoint to register new user
+app.post('/register', (req, res) => {
+
+  let data = req.body;
+  console.log('Received data:', data);
+  if (data.length > 0 && !Array.isArray(data)) {
+      data = [data]
+  }
+
+  const columns = Object.keys(data[0]).join(', ');
+  const values = data.map(Object.values);
+
+  const placeholders = data.map(() => `(${new Array(Object.keys(data[0]).length).fill('?').join(', ')})`).join(', ');
+
+  const query = `INSERT INTO Drivers (${columns}) VALUES ${placeholders}`;
+
+  console.log('Executing query:', query);
+  console.log('With values:', values.flat());
+
+  db.query(query, values.flat(), (err, results) => {
+      if (err) {
+          console.error('Error executing query:', err);
+          res.status(500).json({ message: 'Server error', error: err.message });
+          return;
+      }
+      console.log('Data inserted into database:', results);
+      res.json(results);
+  });
+});
+
+// Endpoint to unregister user
+app.delete('/delete', (req, res) => {
+  let { keyIDs, sessionIDs } = req.body;
+  keyIDs = Array.isArray(keyIDs) ? keyIDs.map(id => parseInt(id, 10)) : [parseInt(keyIDs, 10)];
+  sessionIDs = sessionIDs
+        ? (Array.isArray(sessionIDs) ? sessionIDs.map(id => parseInt(id, 10)) : [parseInt(sessionIDs, 10)])
+        : [];
+
+  console.log('Received data: %O, %O', keyIDs, sessionIDs);
+  if (keyIDs.length > 0 && !Array.isArray(keyIDs)) {
+      keyIDs = [keyIDs]
+  }
+
+  // Case 1: Delete Driver and all his Sessions
+  if (sessionIDs.length === 0 || !sessionIDs) {
+    const placeholders = keyIDs.map(() => '?').join(', ');
+    const queryDrivers = `DELETE FROM Drivers WHERE KeyID IN (${placeholders})`;
+    const querySessions = `DELETE FROM Sessions WHERE KeyID IN (${placeholders})`;
+
+    db.query(querySessions, keyIDs, (err, sessionResults) => {
+      if (err) {
+          console.error('Error deleting sessions:', err);
+          res.status(500).json({ message: 'Server error', error: err.message });
+          return;
+      }
+
+      db.query(queryDrivers, keyIDs, (err, driverResult) => {
+        if (err) {
+            console.error('Error deleting drivers:', err);
+            return res.status(500).json({ error: 'Server error', details: err.message });
+        }
+
+        // Reset AUTO_INCREMENT for Drivers table
+        db.query(`SELECT MAX(KeyID) AS maxKeyID FROM Drivers`, (err, result) => {
+          if (err) return res.status(500).json({ error: 'Server error', details: err.message });
+
+          const maxKeyID = result[0].maxKeyID || 0;
+          db.query(`ALTER TABLE Drivers AUTO_INCREMENT = ?`, [maxKeyID + 1]);
+
+          res.json({
+              message: 'Drivers and related sessions deleted successfully',
+              deletedDrivers: driverResult.affectedRows,
+              deletedSessions: sessionResults.affectedRows,
+              newAutoIncrement: maxKeyID + 1
+          });
+        });
+      });
+    });
+  } else {
+    // Case 2: Delete specific sessions for driver
+    const keyPlaceholders = keyIDs.map(() => '?').join(', ');
+    const sessionPlaceholders = sessionIDs.map(() => '?').join(', ');
+    const sqlDeleteSessions = `DELETE FROM Sessions WHERE KeyID IN (${keyPlaceholders}) AND sessionID IN (${sessionPlaceholders})`;
+
+    db.query(sqlDeleteSessions, [...keyIDs, ...sessionIDs], (err, sessionResult) => {
+      if (err) {
+          console.error('Error deleting sessions:', err);
+          return res.status(500).json({ error: 'Database error', details: err.message });
+      }
+      res.json({
+        message: 'Sessions deleted successfully',
+        deletedSessions: sessionResult.affectedRows
+      });
+    });
+  }
+});
+
+// Endpoint to confirm login
+app.get('/login', (req, res) => {
+  let email = req.query.email;
+  let password = req.query.password;
+  if (!email || email.trim().length === 0) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  if (!password || password.trim().length=== 0) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+  const query = `SELECT * FROM Drivers WHERE email = ? AND password = ?`;
+  db.query(query, [email.trim(), password.trim()], (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Server error');
+      return;
+    }
+    res.json(results);
+  });
 });

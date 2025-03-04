@@ -24,7 +24,7 @@ function MainContent() {
     fetchData();
   }, []);
 
-  const driverScore = 850;
+  const driverScore = 750;
   // const driverScore = driver[0].currentScore;
 
   return (
