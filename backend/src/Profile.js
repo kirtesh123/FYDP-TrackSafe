@@ -61,33 +61,13 @@ const Profile = () => {
         </div>
       </div>
       <div className="profile-content">
-        <div className="summary">
-          <h3>Summary</h3>
-          <p>{user?.about}</p>
-          <h4>Certifications</h4>
-          <p>{user?.certifications}</p>
-        </div>
         <div className="car-details">
           <h3>Car Details</h3>
           <img src={user?.carImage || "default-car.png"} alt="Car" className="car-image" />
           <p><strong>Make:</strong> {user?.carMake}</p>
           <p><strong>Model:</strong> {user?.carModel}</p>
-          <p><strong>Year:</strong> {user?.carYear}</p>
           <p><strong>License Plate:</strong> {user?.carLicensePlate}</p>
         </div>
-      </div>
-      <div className="reviews">
-        <h3>Reviews</h3>
-        {user?.reviews && user.reviews.length > 0 ? (
-          user.reviews.map((review, index) => (
-            <div key={index} className="review">
-              <p><strong>{review.reviewer}:</strong> {review.comment}</p>
-              <p className="rating">⭐ {review.rating}</p>
-            </div>
-          ))
-        ) : (
-          <p>No reviews available.</p>
-        )}
       </div>
       <div className="sessions">
         <h3>Session History</h3>
