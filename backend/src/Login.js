@@ -12,23 +12,33 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    // Check if email and password are entered
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
 
-      if (!response.ok) {
-        throw new Error("Invalid login credentials");
-      }
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/login?email=${email}&password=${password}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       const result = await response.json();
-      console.log("Login successful:", result);
-      localStorage.setItem("token", result.token); // Store auth token
-      navigate("/"); // Redirect to home page
+
+      if (response.ok && Object.keys(result).length !== 0) {
+        console.log("Login successful:", result);
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("user", JSON.stringify(result)); // Store user data
+        navigate("/profile"); // Redirect to profile page
+      } else {
+        setError("Invalid credentials or user does not exist.");
+      }
     } catch (error) {
-      setError(error.message);
+      setError("An error occurred. Please try again later.");
     }
   };
 
