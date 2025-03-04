@@ -8,17 +8,25 @@ const Profile = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch user profile from local storage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      fetchSessions(parsedUser.keyID); // Fetch sessions using KeyID
-    } else {
-      setError("User not found. Please log in.");
-      setLoading(false);
-    }
-  }, []);
+      const fetchData = async () => {
+        try {
+          const keyID = localStorage.getItem("KeyID");
+          if (!keyID) {
+            setError("User not found. Please log in.");
+            setLoading(false);
+          }
+          const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
+          const result = await response.json();
+          // console.log('Driver Data fetched from API:', result); // Log the fetched data
+          setUser(result[0] || {});
+          fetchSessions(keyID); // Fetch sessions using KeyID
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
+    }, []);
 
   const fetchSessions = async (keyID) => {
     try {

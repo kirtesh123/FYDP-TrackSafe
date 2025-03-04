@@ -24,6 +24,7 @@ const createTableQuery1 = `
     phoneNumber VARCHAR(12) NOT NULL,
     region VARCHAR(30) NOT NULL,
     carModel VARCHAR(50) NOT NULL,
+    licensePlate VARCHAR() NOT NULL,
     currentScore INT,
     previousScore INT
   )

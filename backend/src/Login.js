@@ -53,8 +53,8 @@ const Login = ({ setIsAuthenticated }) => {
 
       const result = await response.json();
       console.log("User registration successful:", result);
-      localStorage.setItem("token", result.token); // Store auth token
-      localStorage.setItem("KeyID", result.insertId); // Store KeyID of driver
+      localStorage.setItem("token", result['token']); // Store auth token
+      localStorage.setItem("KeyID", result['insertId']); // Store KeyID of driver
       console.log("KeyID: ", localStorage.getItem("KeyID"));
       setIsAuthenticated(true);
       navigate("/"); // Redirect to home page

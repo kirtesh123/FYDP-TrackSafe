@@ -238,6 +238,7 @@ app.post('/register', (req, res) => {
           return;
       }
       console.log('Data inserted into database:', results);
+      results.token = "1"
       res.json(results);
   });
 });
