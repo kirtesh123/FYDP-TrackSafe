@@ -1,34 +1,40 @@
-/* Updated Profile.css - Removed Reviews and Certifications */
+/* Improved Profile.css - Centered & Opaque Box */
 
 .profile-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  max-width: 70vw; /* Increased width */
-  margin: auto;
-  background: rgba(255, 255, 255, 0.7); /* More solid white background */
+  padding: 30px;
+  max-width: 800px; /* Set a fixed max-width for better alignment */
+  width: 90%; /* Adjust width for responsiveness */
+  margin: 5% auto; /* Center the box in the middle of the screen */
+  background: rgba(255, 255, 255, 0.85); /* More opaque background for better visibility */
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: black;
-  padding: 40px;
 }
 
 .profile-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 20px;
+  padding: 20px 0;
+  text-align: center;
 }
 
 .profile-pic {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin-right: 20px;
+  margin-bottom: 15px;
+}
+
+.profile-info {
+  text-align: center;
 }
 
 .profile-info h2 {
@@ -45,17 +51,19 @@
 
 .profile-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.9); /* More solid white background for readability */
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .car-details {
-  width: 100%; /* Adjusted width to occupy full space */
-  padding: 10px;
+  width: 100%;
+  padding: 15px;
 }
 
 .car-image {
@@ -69,26 +77,23 @@
   padding: 20px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 @media (max-width: 768px) {
-  .profile-content {
-    flex-direction: column;
-    align-items: center;
+  .profile-container {
+    width: 95%;
+    margin: 10% auto;
   }
 }
 
 @media (max-width: 480px) {
   .profile-container {
-    padding: 10px;
-    max-width: 90vw; /* Adjust for smaller screens */
+    padding: 15px;
+    max-width: 95vw;
   }
   .profile-header {
     flex-direction: column;
-    text-align: center;
-  }
-  .profile-pic {
-    margin-bottom: 10px;
   }
 }
