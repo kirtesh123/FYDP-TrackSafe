@@ -8,7 +8,14 @@ body {
   align-items: center;
   height: 100vh;
   background: url('./Login_bg.jpeg') no-repeat center center/cover;
+  background-color: black;
   font-family: Arial, sans-serif;
+}
+
+main {
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .login-container {
@@ -17,8 +24,11 @@ body {
   align-items: center;
   width: 100%;
   height: 100vh;
+  background: none;
 }
 
+.selection-container,
+.register-container,
 .login-form {
   background: rgba(255, 255, 255, 0.1);
   padding: 3vw;
@@ -27,40 +37,46 @@ body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   text-align: center;
+  font-size: 1.2vw;
   width: 40vw;
   max-width: 500px;
   min-width: 300px;
   color: white;
 }
 
+.register-container h2,
 .login-form h2 {
   font-size: 2vw;
   margin-bottom: 2vw;
 }
 
+.register-container label,
 .login-form label {
   display: block;
   text-align: left;
-  font-size: 1vw;
+  font-size: 1.2vw;
   margin-bottom: 5px;
   color: white;
 }
 
+.register-container input,
 .login-form input {
   width: 100%;
   padding: 1vw;
   margin-bottom: 1.5vw;
   border: none;
   border-radius: 5px;
-  font-size: 1vw;
+  font-size: 1.2vw;
   background: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
+.register-container input::placeholder,
 .login-form input::placeholder {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.register-container input:focus,
 .login-form input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.3);
@@ -73,21 +89,42 @@ body {
   margin-bottom: 2vw;
 }
 
-.login-form button {
-  width: 100%;
+.register-container > .submit-button,
+.login-form > .submit-button {
+  width: 80%;
   padding: 1.2vw;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1vw;
+  font-size: 1.2vw;
   font-weight: bold;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(117, 236, 123, 0.507);
   color: white;
   transition: background 0.3s ease;
 }
 
-.login-form button:hover {
-  background: rgba(255, 255, 255, 0.5);
+.register-container > .submit-button:hover,
+.login-form > .submit-button:hover {
+  background: rgba(117, 236, 123, 0.738);
+}
+
+.register-container > .back-button,
+.login-form > .back-button {
+  width: 80%;
+  padding: 1.2vw;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2vw;
+  font-weight: bold;
+  background: rgba(227, 75, 75, 0.604);
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.register-container > .back-button:hover,
+.login-form > .back-button:hover {
+  background: rgba(227, 75, 75, 0.875);
 }
 
 .register-link {
@@ -130,4 +167,38 @@ body {
   .register-link {
     font-size: 3vw;
   }
+}
+
+.option-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 15px 0;
+  border: none;
+  border-radius: 10px;
+  background: #61a8f4;
+  color: white;
+  font-size: 1.2vw;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.option-button:hover {
+  background: #0056b3;
+}
+
+.back-button {
+  display: block;
+  margin: 15px auto 0;
+  background: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.back-button:hover {
+  background: #c82333;
 }

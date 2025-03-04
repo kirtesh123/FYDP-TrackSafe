@@ -160,10 +160,12 @@ app.get('/sessions', (req, res) => {
 // Endpoint to get driver data
 app.get('/driver', (req, res) => {
   let user = parseInt(req.query.user, 10);
+  let email = req.query.email;
+  let password = req.query.password;
   if (isNaN(user) || user <= 0) {
     user = null; // Handle invalid or missing limit
   }
-  const query = 'SELECT * FROM Drivers' + (user?` WHERE KeyID = ${user}`:'');
+  const query = 'SELECT * FROM Drivers' + (user?` WHERE KeyID = ${user}`: (email && password) ? `WHERE email = ${email} AND password = ${password}` : '');
   db.query(query, (err, results) => {
     if (err) {
       console.error('Error executing query:', err);
@@ -212,10 +214,11 @@ app.listen(port, () => {
 // Endpoint to register new user
 app.post('/register', (req, res) => {
 
-  let data = req.body;
+  let data = [req.body];
   console.log('Received data:', data);
-  if (data.length > 0 && !Array.isArray(data)) {
-      data = [data]
+  if (data.length <= 0) {
+      console.error("Invalid registeration:");
+      return;
   }
 
   const columns = Object.keys(data[0]).join(', ');
@@ -307,9 +310,8 @@ app.delete('/delete', (req, res) => {
 });
 
 // Endpoint to confirm login
-app.get('/login', (req, res) => {
-  let email = req.query.email;
-  let password = req.query.password;
+app.post('/login', (req, res) => {
+  let {email, password } = req.body
   if (!email || email.trim().length === 0) {
     return res.status(400).json({ error: 'Email is required' });
   }
@@ -323,6 +325,7 @@ app.get('/login', (req, res) => {
       res.status(500).send('Server error');
       return;
     }
+    results[0].token = "1";
     res.json(results);
   });
 });

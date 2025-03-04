@@ -20,16 +20,17 @@ function App() {
     // Convert token existence to boolean
     setIsAuthenticated(!!token);
   }, []);
+
   return (
     <Router>
       <div className="App">
-        {isAuthenticated && <NavigationBar />}
+        {isAuthenticated && <NavigationBar setIsAuthenticated={setIsAuthenticated} />}
         <main>
           <Routes>
             {/* Main Content on Home */}
             <Route path="/" element={isAuthenticated ? <MainContent /> : <Navigate to="/login" />} />  
             {/* Profile Page Route */}
-            <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login />} />  
+            <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login setIsAuthenticated={setIsAuthenticated} />} />  
             {/* Login Page  */}
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} /> 
           </Routes>

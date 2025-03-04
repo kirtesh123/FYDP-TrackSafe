@@ -12,10 +12,12 @@ function MainContent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/driver?user=${1}`);
+        const keyID = localStorage.getItem("KeyID");
+        const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
         const result = await response.json();
-        console.log('Data fetched from API:', result); // Log the fetched data
-        setDriver(result || {});
+        // console.log('Driver Data fetched from API:', result); // Log the fetched data
+        setDriver(result[0] || {});
+        console.log(result)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -24,7 +26,8 @@ function MainContent() {
     fetchData();
   }, []);
 
-  const driverScore = 750;
+  const driverScore = driver.currentScore;
+  console.log("Score: ", driverScore)
   // const driverScore = driver[0].currentScore;
 
   return (
@@ -46,10 +49,11 @@ function SessionsToday() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const keyID = localStorage.getItem("KeyID");
         const offset = (currentPage - 1) * 5;
-        const response = await fetch(`http://localhost:5000/sessions?limit=5&offset=${offset}&user=${1}`);
+        const response = await fetch(`http://localhost:5000/sessions?limit=5&offset=${offset}&user=${keyID}`);
         const result = await response.json();
-        console.log('Data fetched from API:', result); // Log the fetched data
+        console.log('Sessions Data fetched from API:', result); // Log the fetched data
         setSessions(result || []);
         setTotalPages(Math.ceil((result || []).length / 5));
       } catch (error) {
