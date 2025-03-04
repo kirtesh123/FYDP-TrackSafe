@@ -3,32 +3,37 @@ import "./Profile.css";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch user profile from API
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile");
-        }
-        const data = await response.json();
-        setUser(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
+    // Fetch user profile from local storage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      fetchSessions(parsedUser.keyID); // Fetch sessions using KeyID
+    } else {
+      setError("User not found. Please log in.");
+      setLoading(false);
+    }
   }, []);
+
+  const fetchSessions = async (keyID) => {
+    try {
+      const response = await fetch(`http://localhost:5000/sessions?user=${keyID}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sessions");
+      }
+      const data = await response.json();
+      setSessions(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="error">{error}</p>;
@@ -36,15 +41,11 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <img src={user.profilePic} alt="Profile" className="profile-pic" />
+        <img src={user.profilePic || "default-avatar.png"} alt="Profile" className="profile-pic" />
         <div className="profile-info">
           <h2>{user.name}</h2>
           <p>{user.location}</p>
-          <div className="action-buttons">
-            <button>Chat</button>
-            <button>Call</button>
-            <button>Video Call</button>
-          </div>
+          <p><strong>Driving Score:</strong> {user.driveScore}</p>
         </div>
       </div>
       <div className="profile-content">
@@ -56,7 +57,7 @@ const Profile = () => {
         </div>
         <div className="car-details">
           <h3>Car Details</h3>
-          <img src={user.carImage} alt="Car" className="car-image" />
+          <img src={user.carImage || "default-car.png"} alt="Car" className="car-image" />
           <p><strong>Make:</strong> {user.carMake}</p>
           <p><strong>Model:</strong> {user.carModel}</p>
           <p><strong>Year:</strong> {user.carYear}</p>
@@ -65,12 +66,28 @@ const Profile = () => {
       </div>
       <div className="reviews">
         <h3>Reviews</h3>
-        {user.reviews.map((review, index) => (
-          <div key={index} className="review">
-            <p><strong>{review.reviewer}:</strong> {review.comment}</p>
-            <p className="rating">⭐ {review.rating}</p>
-          </div>
-        ))}
+        {user.reviews && user.reviews.length > 0 ? (
+          user.reviews.map((review, index) => (
+            <div key={index} className="review">
+              <p><strong>{review.reviewer}:</strong> {review.comment}</p>
+              <p className="rating">⭐ {review.rating}</p>
+            </div>
+          ))
+        ) : (
+          <p>No reviews available.</p>
+        )}
+      </div>
+      <div className="sessions">
+        <h3>Session History</h3>
+        {sessions.length > 0 ? (
+          <ul>
+            {sessions.map((session, index) => (
+              <li key={index}>{session.date} - {session.details}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No sessions available.</p>
+        )}
       </div>
     </div>
   );

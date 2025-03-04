@@ -24,15 +24,11 @@ const Login = ({ setIsAuthenticated }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
-        throw new Error("Invalid login credentials");
-      }
-
       const result = await response.json();
       console.log("Login successful:", result);
       localStorage.setItem("token", result[0].token); // Store auth token
       localStorage.setItem("KeyID", result[0].KeyID); // Store KeyID of driver
-      console.log("eyID: ", localStorage.getItem("KeyID"));
+      console.log("KeyID: ", localStorage.getItem("KeyID"));
       setIsAuthenticated(true);
       navigate("/"); // Redirect to home page
     } catch (error) {
@@ -56,14 +52,14 @@ const Login = ({ setIsAuthenticated }) => {
       }
 
       const result = await response.json();
-      // console.log("User registration successful:", result);
+      console.log("User registration successful:", result);
       localStorage.setItem("token", result.token); // Store auth token
       localStorage.setItem("KeyID", result.insertId); // Store KeyID of driver
       console.log("KeyID: ", localStorage.getItem("KeyID"));
       setIsAuthenticated(true);
       navigate("/"); // Redirect to home page
     } catch (error) {
-      setError(error.message);
+      setError("An error occurred. Please try again later.");
     }
   };
 
