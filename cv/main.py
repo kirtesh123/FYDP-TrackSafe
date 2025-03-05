@@ -8,6 +8,7 @@ import sys
 from datetime import datetime
 
 from road.roadCV import run_road_cv
+from sensor.speed_limit import get_speed_violations
 
 load_dotenv()
 
@@ -129,10 +130,12 @@ def main():
         sys.exit(1)
 
     # Constants for other violations
-    proximity_warnings_vehicles = 5  
-    proximity_warnings_pedestrians = 3 
-    speed_violations = 2  
-    traffic_violations = 1  
+    proximity_warnings_vehicles = run_road_cv()
+    proximity_warnings_pedestrians = 3
+    speed_violations = get_speed_violations()  
+    traffic_violations = 1
+
+    print(f"\nRoad CV - Close car count: {proximity_warnings_vehicles}")
 
     driver_name = driver_data.get("driver_name")
     if not driver_name:
@@ -209,9 +212,6 @@ def main():
     for session in sessions:
         print(session)
 
-    # --- Road CV Processing ---
-    close_object_count = run_road_cv()
-    print(f"\nRoad CV - Close object count: {close_object_count}")
 
     cursor.close()
     conn.close()
