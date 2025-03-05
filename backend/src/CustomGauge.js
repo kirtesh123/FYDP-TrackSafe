@@ -24,7 +24,17 @@ const CustomGauge = ({ driveScore }) => {
                 { value: 780 },
                 { value: 900 },
               ],
+              defaultTickValueConfig: {
+                style: { fill: 'black', color: 'black'},
+              },
+              defaultTickLineConfig: {
+                color: 'black',
+              }
             },
+            valueLabel: {
+              formatTextValue: (value) => `${value}`,
+              style: { fill: 'black', color: 'black' },
+            }
           }}
           arc={{
             colorArray: ['#EA4228', '#F5CD19', '#5BE12C'],

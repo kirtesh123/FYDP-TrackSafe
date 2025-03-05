@@ -72,6 +72,16 @@ main {
   color: black;
 }
 
+.gauge-container > .value-text {
+  color: black;
+  fill: black;
+}
+
+.gauge-container > .tick-value text {
+  color: black;
+  fill: black;
+}
+
 .gauge {
   width: 100%;
   max-width: 800px;
