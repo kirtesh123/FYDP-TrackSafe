@@ -11,6 +11,88 @@ from road.roadCV import run_road_cv
 
 load_dotenv()
 
+def calculate_driver_score(eyes_closed_count, head_turn_count, proximity_warnings_vehicles, 
+                           proximity_warnings_pedestrians, speed_violations, traffic_violations):
+    base_score = 100
+    score = base_score
+
+
+    penalty_eyes = 0
+    if eyes_closed_count > 0:
+        for i in range(1, eyes_closed_count + 1):
+            if i <= 3:
+                penalty_eyes += 4
+            elif i <= 6:
+                penalty_eyes += 5
+            else:
+                penalty_eyes += 6
+
+   
+    penalty_head = 0
+    if head_turn_count > 0:
+        for i in range(1, head_turn_count + 1):
+            if i % 2 == 0:
+                penalty_head += 3
+            else:
+                penalty_head += 2
+
+  
+    penalty_proximity_vehicles = proximity_warnings_vehicles * 4
+    penalty_proximity_pedestrians = proximity_warnings_pedestrians * 6
+
+
+    penalty_speed = 0
+    for i in range(speed_violations):
+        penalty_speed += 7 + (i * 2)
+
+   
+    penalty_traffic = traffic_violations * 10
+
+ 
+    total_penalty = (penalty_eyes + penalty_head + penalty_proximity_vehicles +
+                     penalty_proximity_pedestrians + penalty_speed + penalty_traffic)
+
+  
+    final_score = base_score - total_penalty
+    if final_score < 0:
+        final_score = 0
+
+
+    if (eyes_closed_count == 0 and head_turn_count == 0 and 
+        proximity_warnings_vehicles == 0 and proximity_warnings_pedestrians == 0 and 
+        speed_violations == 0 and traffic_violations == 0):
+        final_score += 5
+
+
+    if total_penalty > 50:
+        reduction = int(total_penalty * 0.1)
+        final_score -= reduction
+        if final_score < 0:
+            final_score = 0
+
+    final_score = int(round(final_score))
+    print(final_score)
+
+    breakdown = {
+        "base_score": base_score,
+        "penalty_eyes": penalty_eyes,
+        "penalty_head": penalty_head,
+        "penalty_proximity_vehicles": penalty_proximity_vehicles,
+        "penalty_proximity_pedestrians": penalty_proximity_pedestrians,
+        "penalty_speed": penalty_speed,
+        "penalty_traffic": penalty_traffic,
+        "total_penalty": total_penalty,
+        "final_score": final_score
+    }
+
+    # Simulate an external factor adjustment
+    external_factor = 1.05
+    final_score = int(final_score * external_factor)
+    if final_score > base_score:
+        final_score = base_score
+
+    return final_score, breakdown
+
 def main():
     # --- Driver Session Processing ---
     try:
@@ -46,6 +128,7 @@ def main():
         print(f"Time conversion error: {e}")
         sys.exit(1)
 
+    # Constants for other violations
     proximity_warnings_vehicles = 5  
     proximity_warnings_pedestrians = 3 
     speed_violations = 2  
@@ -64,11 +147,16 @@ def main():
     else:
         driver_id = result[0]
         previous_score = result[1]
-        base_score = 100
-        penalty = (5 * eyes_closed_count) + (2 * head_turn_count)
-        new_current_score = base_score - penalty
-        if new_current_score < 0:
-            new_current_score = 0
+        
+  
+        new_current_score, breakdown = calculate_driver_score(
+            eyes_closed_count, 
+            head_turn_count, 
+            proximity_warnings_vehicles, 
+            proximity_warnings_pedestrians, 
+            speed_violations, 
+            traffic_violations
+        )
 
         update_query = """
         UPDATE Drivers 
@@ -122,7 +210,6 @@ def main():
         print(session)
 
     # --- Road CV Processing ---
-    # Call your partner's road CV processing function
     close_object_count = run_road_cv()
     print(f"\nRoad CV - Close object count: {close_object_count}")
 
