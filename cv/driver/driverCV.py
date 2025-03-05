@@ -171,8 +171,7 @@ def track_features_video(cap, face_cascade, eye_cascade):
 
     return {
         'eyes_closed_times': cleaned_times,
-        'long_head_turn_times': long_head_turn_times,
-        'quit': quit_pressed
+        'long_head_turn_times': long_head_turn_times
     }
 
 
@@ -180,7 +179,7 @@ def driverCV():
     face_cascade, eye_cascade = initialize_cascades()
 
     bucket_name = 'driver-cam-footage'
-    file_name = 'driver_test.mp4'
+    file_name = 'Kevin_driver_cam_2025-03-04_22-34-25.mp4'
 
 
     if not file_name.endswith('.mp4'):
@@ -201,18 +200,19 @@ def driverCV():
             # Clean up video file 
             os.remove(video_path)
             print("Video file has been deleted after processing.")
-            print(f"Session Data (before metadata): {session_data}")
         else:
             print("Failed to download the video file.")
             if os.path.exists(video_path):
                 os.remove(video_path)
             return None
 
-   
-    session_data["session_id"] = str(uuid.uuid4())
-    session_data["key_id"] = str(uuid.uuid4())
+
     session_data["time_start"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(processing_start))
     session_data["time_end"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(processing_end))
+    
+
+    driver_name = file_name.split('_')[0]
+    session_data["driver_name"] = driver_name
 
     print(f"Session Data (with metadata): {session_data}")
     return session_data
@@ -220,10 +220,8 @@ def driverCV():
 if __name__ == '__main__':
     driverCV()
 
-
-
-
-'''face_cascade, eye_cascade = initialize_cascades()
+'''
+face_cascade, eye_cascade = initialize_cascades()
 print("Choose the mode: \n1. Webcam \n2. Video File")
 choice = input("Enter your choice (1 or 2): ")
 

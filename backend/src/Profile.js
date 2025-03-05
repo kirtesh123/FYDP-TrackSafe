@@ -8,40 +8,40 @@ const Profile = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const keyID = localStorage.getItem("KeyID");
-          if (!keyID) {
-            setError("User not found. Please log in.");
-            setLoading(false);
-          }
-          const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
-          const result = await response.json();
-          // console.log('Driver Data fetched from API:', result); // Log the fetched data
-          setUser(result[0] || {});
-          fetchSessions(keyID); // Fetch sessions using KeyID
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-  
-      fetchData();
-    }, []);
+    const fetchData = async () => {
+      const keyID = localStorage.getItem("KeyID");
 
-  const fetchProfile = async (keyID) => {
-    try {
-      const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch profile");
+      if (!keyID) {
+        setError("User not found. Please log in.");
+        setLoading(false);
+        return; // 🔹 Stop execution if KeyID is missing
       }
-      const data = await response.json();
-      setUser(data[0]);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      try {
+        const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch profile data");
+        }
+        const result = await response.json();
+
+        if (!result || result.length === 0) {
+          setError("User data not found.");
+          setLoading(false);
+          return;
+        }
+
+        setUser(result[0]); // ✅ Set user data
+        await fetchSessions(keyID); // ✅ Fetch sessions only after profile data is set
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false); // ✅ Ensure loading state is updated
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const fetchSessions = async (keyID) => {
     try {
@@ -62,33 +62,30 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <img src={user?.profilePic || "default-avatar.png"} alt="Profile" className="profile-pic" />
+        <img src={user?.profilePic || "/images/profile_img.png"} alt="Profile" className="profile-pic" />
         <div className="profile-info">
-          <h2>{user?.name}</h2>
-          <p>{user?.location}</p>
-          <p><strong>Driving Score:</strong> {user?.driveScore}</p>
+          <h1>{user?.name}</h1>
         </div>
       </div>
       <div className="profile-content">
+        <div className="user-details">
+          <h3>User Details</h3>
+          <p><strong>Email:</strong> {user?.email}</p>
+          <p><strong>Phone Number:</strong> {user?.phoneNumber}</p>
+          <p><strong>Region:</strong> {user?.region}</p>
+        </div>
         <div className="car-details">
           <h3>Car Details</h3>
-          <img src={user?.carImage || "default-car.png"} alt="Car" className="car-image" />
-          <p><strong>Make:</strong> {user?.carMake}</p>
-          <p><strong>Model:</strong> {user?.carModel}</p>
-          <p><strong>License Plate:</strong> {user?.carLicensePlate}</p>
+          <div className="car-columns">
+            <div className="car-info">
+              <p><strong>Model:</strong> {user?.carModel}</p>
+              <p><strong>License Plate:</strong> {user?.licensePlate}</p>
+            </div>
+            <div className="car-image">
+              <img src={user?.carImage || "/images/car_default.png"} alt="Car"/>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="sessions">
-        <h3>Session History</h3>
-        {sessions.length > 0 ? (
-          <ul>
-            {sessions.map((session, index) => (
-              <li key={index}>{session.date} - {session.details}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No sessions available.</p>
-        )}
       </div>
     </div>
   );

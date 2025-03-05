@@ -28,8 +28,10 @@ const BackgroundSetter = () => {
   useEffect(() => {
     if (location.pathname === "/login") {
       document.body.style.background = "url('/images/Login_bg.jpeg') no-repeat center center/cover";
+      document.body.style.backgroundAttachment = "fixed";
     } else {
       document.body.style.background = "url('/images/App.jpeg') no-repeat center center/cover";
+      document.body.style.backgroundAttachment = "fixed";
     }
   }, [location.pathname]); // Runs when route changes
 

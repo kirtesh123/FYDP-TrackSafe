@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
-import profileImage from './profile_img.png';  // Update the path to your profile image
 import tslogo from './logo.png';     // Update the path to your logo image
 
 const NavigationBar = ({ setIsAuthenticated }) => {
@@ -30,7 +29,7 @@ const NavigationBar = ({ setIsAuthenticated }) => {
           <Nav.Link href="/">Home</Nav.Link>
         </Nav>
         <Nav>
-          <NavDropdown title={<img src={profileImage} alt="Profile" className="profile-image" />} id="basic-nav-dropdown">
+          <NavDropdown title={<img src='/images/profile_img.png' alt="Profile" className="profile-image" />} id="basic-nav-dropdown">
             <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
             <NavDropdown.Item href="/settings">Settings</NavDropdown.Item>
             <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
