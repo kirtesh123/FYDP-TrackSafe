@@ -78,7 +78,7 @@ function SessionsToday() {
   );
 
   return (
-    <div className="sessions-today">
+    <div className="session-table">
       <h2>Sessions Today</h2>
       <table className="table">
         <thead>

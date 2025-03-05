@@ -3,42 +3,40 @@ body, html {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
+}
+
+/* Fix Navbar Overlapping */
+main {
+  padding-top: 70px;
 }
 
 /* Background Layer (Semi-Transparent White) */
-.main-content-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
-  z-index: 1; /* Sits above background image */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 /* Main Content Container */
 .main-content {
-  position: relative;
-  z-index: 2; /* Ensures it's above the white layer */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  margin-top: 100px;
+  width: 80vw;
   min-height: 100vh;
   padding: 30px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: black;
 }
 
-/* Content Box (Fully White) */
-.content-box {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  max-width: 900px;
-  width: 90%;
-  text-align: center;
-}
 
 /* Table Styling */
 .session-table {
@@ -66,21 +64,57 @@ body, html {
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* Fix Navbar Overlapping */
-main {
-  padding-top: 70px;
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  color: black;
+}
+
+.gauge {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  color: black;
+}
+
+.score {
+  text-align: center;
+  color: black;
+}
+
+.score-number {
+  font-size: 1vw;
+  font-weight: bold;
+  color: black;
+}
+
+.score-label {
+  font-size: 2.5vw;
+  font-weight: bold;
+  color: #666;
 }
 
 /* Responsive Styling */
 @media (max-width: 768px) {
-  .content-box {
-    width: 95%;
+
+  .score-number {
+    font-size: 32px;
+  }
+
+  .score-label {
+    font-size: 18px;
   }
 }
 
 @media (max-width: 480px) {
-  .content-box {
-    padding: 15px;
-    max-width: 95vw;
+
+  .score-number {
+    font-size: 12px;
+  }
+
+  .score-label {
+    font-size: 16px;
   }
 }
