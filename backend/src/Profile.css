@@ -1,20 +1,44 @@
-/* Improved Profile.css - Centered & Opaque Box */
+/* Improved Profile.css - Centered & Wider */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
 
 .profile-container {
+  width: 80vw;
+  min-width: 900px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 30px;
-  max-width: 800px; /* Set a fixed max-width for better alignment */
-  width: 90%; /* Adjust width for responsiveness */
-  margin: 5% auto; /* Center the box in the middle of the screen */
-  background: rgba(255, 255, 255, 0.85); /* More opaque background for better visibility */
-  border-radius: 12px;
+  justify-content: flex-start;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: black;
+  margin-top: 100px;
+  flex-grow: 1; /* Ensures it stretches */
+  align-self: stretch; /* Ensures it fills the width */
+  min-height: 100vh; /* Ensures full height */
+  height: auto; /* ✅ Allows it to expand when content is longer */
+  max-height: none; /* ✅ Prevents it from restricting growth */
+}
+
+.user-details, .car-details {
+  width: 60vw;
+  min-width: 600px;
+  margin: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  
+  flex-grow: 1; /* ✅ Ensures it expands naturally */
 }
 
 .profile-header {
@@ -27,14 +51,18 @@
 }
 
 .profile-pic {
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  margin-bottom: 15px;
+  object-fit: cover;
+  margin: 20px;
+  margin-top: 30px;
 }
 
 .profile-info {
   text-align: center;
+  margin: 10px;
+  margin-top: 20px;
 }
 
 .profile-info h2 {
@@ -49,42 +77,38 @@
   color: black;
 }
 
-.profile-content {
+.user-details p, .car-details p{
+  font-size: 1vw;
+  text-align: left;
+}
+
+.car-columns {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.car-details {
-  width: 100%;
-  padding: 15px;
+.car-info {
+  flex: 1;
 }
 
-.car-image {
+.car-image img {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 25px;
   margin-bottom: 10px;
-}
-
-.sessions {
-  width: 100%;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  object-fit: contain;
 }
 
 @media (max-width: 768px) {
   .profile-container {
     width: 95%;
+    max-width: 95vw;
     margin: 10% auto;
+  }
+
+  .car-details, .sessions {
+    width: 100%;
   }
 }
 
