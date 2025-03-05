@@ -28,6 +28,21 @@ const Profile = () => {
       fetchData();
     }, []);
 
+  const fetchProfile = async (keyID) => {
+    try {
+      const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+      const data = await response.json();
+      setUser(data[0]);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchSessions = async (keyID) => {
     try {
       const response = await fetch(`http://localhost:5000/sessions?user=${keyID}`);
@@ -38,8 +53,6 @@ const Profile = () => {
       setSessions(data);
     } catch (error) {
       setError(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -49,41 +62,21 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <img src={user.profilePic || "default-avatar.png"} alt="Profile" className="profile-pic" />
+        <img src={user?.profilePic || "default-avatar.png"} alt="Profile" className="profile-pic" />
         <div className="profile-info">
-          <h2>{user.name}</h2>
-          <p>{user.location}</p>
-          <p><strong>Driving Score:</strong> {user.driveScore}</p>
+          <h2>{user?.name}</h2>
+          <p>{user?.location}</p>
+          <p><strong>Driving Score:</strong> {user?.driveScore}</p>
         </div>
       </div>
       <div className="profile-content">
-        <div className="summary">
-          <h3>Summary</h3>
-          <p>{user.about}</p>
-          <h4>Certifications</h4>
-          <p>{user.certifications}</p>
-        </div>
         <div className="car-details">
           <h3>Car Details</h3>
-          <img src={user.carImage || "default-car.png"} alt="Car" className="car-image" />
-          <p><strong>Make:</strong> {user.carMake}</p>
-          <p><strong>Model:</strong> {user.carModel}</p>
-          <p><strong>Year:</strong> {user.carYear}</p>
-          <p><strong>License Plate:</strong> {user.carLicensePlate}</p>
+          <img src={user?.carImage || "default-car.png"} alt="Car" className="car-image" />
+          <p><strong>Make:</strong> {user?.carMake}</p>
+          <p><strong>Model:</strong> {user?.carModel}</p>
+          <p><strong>License Plate:</strong> {user?.carLicensePlate}</p>
         </div>
-      </div>
-      <div className="reviews">
-        <h3>Reviews</h3>
-        {user.reviews && user.reviews.length > 0 ? (
-          user.reviews.map((review, index) => (
-            <div key={index} className="review">
-              <p><strong>{review.reviewer}:</strong> {review.comment}</p>
-              <p className="rating">⭐ {review.rating}</p>
-            </div>
-          ))
-        ) : (
-          <p>No reviews available.</p>
-        )}
       </div>
       <div className="sessions">
         <h3>Session History</h3>

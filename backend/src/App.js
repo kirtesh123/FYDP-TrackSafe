@@ -1,11 +1,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react'; 
-import './App.css';
 import NavigationBar from './Navbar';
 import MainContent from './MainContent';
 import Profile from "./Profile";
 import Login from './Login'; // Import Login Page
-import { BrowserRouter as Router, Route, Routes, Navigate} from "react-router-dom";
+import './App.css';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -21,8 +21,24 @@ function App() {
     setIsAuthenticated(!!token);
   }, []);
 
+  // Function to dynamically change the background
+const BackgroundSetter = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/login") {
+      document.body.style.background = "url('/images/Login_bg.jpeg') no-repeat center center/cover";
+    } else {
+      document.body.style.background = "url('/images/App.jpeg') no-repeat center center/cover";
+    }
+  }, [location.pathname]); // Runs when route changes
+
+  return null; // No UI, just applies background
+};
+
   return (
     <Router>
+      <BackgroundSetter /> {/* Dynamically sets background */}
       <div className="App">
         {isAuthenticated && <NavigationBar setIsAuthenticated={setIsAuthenticated} />}
         <main>

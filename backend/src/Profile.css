@@ -1,69 +1,69 @@
-/* Updated Profile.css for Modern User Profile Layout */
+/* Improved Profile.css - Centered & Opaque Box */
 
 .profile-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  max-width: 800px; /* Set a fixed max-width for better alignment */
+  width: 90%; /* Adjust width for responsiveness */
+  margin: 5% auto; /* Center the box in the middle of the screen */
+  background: rgba(255, 255, 255, 0.85); /* More opaque background for better visibility */
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: black;
 }
 
 .profile-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 20px;
+  padding: 20px 0;
+  text-align: center;
 }
 
 .profile-pic {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin-right: 20px;
+  margin-bottom: 15px;
+}
+
+.profile-info {
+  text-align: center;
 }
 
 .profile-info h2 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin-bottom: 5px;
+  color: black;
 }
 
 .profile-info p {
-  font-size: 1rem;
+  font-size: 1.2rem;
   margin-bottom: 10px;
-}
-
-.action-buttons button {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  padding: 10px 15px;
-  margin: 5px;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.action-buttons button:hover {
-  background: rgba(255, 255, 255, 0.4);
+  color: black;
 }
 
 .profile-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-.summary, .car-details {
-  width: 45%;
+.car-details {
+  width: 100%;
+  padding: 15px;
 }
 
 .car-image {
@@ -72,43 +72,28 @@
   margin-bottom: 10px;
 }
 
-.reviews {
+.sessions {
   width: 100%;
   padding: 20px;
-}
-
-.review {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 8px;
-}
-
-.rating {
-  color: gold;
-  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 @media (max-width: 768px) {
-  .profile-content {
-    flex-direction: column;
-    align-items: center;
-  }
-  .summary, .car-details {
-    width: 100%;
-    margin-bottom: 20px;
+  .profile-container {
+    width: 95%;
+    margin: 10% auto;
   }
 }
 
 @media (max-width: 480px) {
   .profile-container {
-    padding: 10px;
+    padding: 15px;
+    max-width: 95vw;
   }
   .profile-header {
     flex-direction: column;
-    text-align: center;
-  }
-  .profile-pic {
-    margin-bottom: 10px;
   }
 }
