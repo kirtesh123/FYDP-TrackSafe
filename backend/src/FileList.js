@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 
 const FileList = () => {
   const [files, setFiles] = useState([]);
+  const serverPort = process.env.REACT_APP_SERVER_PORT;
 
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        const response = await fetch('http://localhost:5000/files');
+        const response = await fetch(`http://localhost:${serverPort}/files`);
         const files = await response.json();
         setFiles(files);
       } catch (error) {
@@ -19,7 +20,7 @@ const FileList = () => {
 
   const downloadFile = async (key) => {
     try {
-      const response = await fetch(`http://localhost:5000/files/${key}`);
+      const response = await fetch(`http://localhost:${serverPort}/files/${key}`);
       const result = await response.text();
       console.log(result); // Log the result message
     } catch (error) {

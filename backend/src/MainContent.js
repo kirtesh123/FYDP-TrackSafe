@@ -5,15 +5,15 @@ import { FaPlay } from 'react-icons/fa';
 
 // Dynamically import CustomGauge with SSR disabled
 const CustomGauge = lazy(() => import('./CustomGauge'));
-
 function MainContent() {
   const [driver, setDriver] = useState({});
+  const serverPort = process.env.REACT_APP_SERVER_PORT;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const keyID = localStorage.getItem("KeyID");
-        const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
+        const response = await fetch(`http://localhost:${serverPort}/driver?user=${keyID}`);
         const result = await response.json();
         // console.log('Driver Data fetched from API:', result); // Log the fetched data
         setDriver(result[0] || {});
@@ -45,13 +45,14 @@ function SessionsToday() {
   const [visibleSessions, setVisibleSessions] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const serverPort = process.env.REACT_APP_SERVER_PORT;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const keyID = localStorage.getItem("KeyID");
         const offset = (currentPage - 1) * 5;
-        const response = await fetch(`http://localhost:5000/sessions?limit=5&offset=${offset}&user=${keyID}`);
+        const response = await fetch(`http://localhost:${serverPort}/sessions?limit=5&offset=${offset}&user=${keyID}`);
         const result = await response.json();
         console.log('Sessions Data fetched from API:', result); // Log the fetched data
         setSessions(result || []);

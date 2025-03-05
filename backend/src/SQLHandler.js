@@ -6,12 +6,13 @@ const SQLHandler = () => {
     const [inputData, setInputData] = useState([]); // Adjust based on your table schema
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const serverPort = process.env.REACT_APP_SERVER_PORT;
 
     const fetchData = async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:5000/sessions');
+            const response = await fetch(`http://localhost:${serverPort}/sessions`);
             const result = await response.json();
             console.log('Data fetched from API:', result); // Log the fetched data
             setData(result || []);
@@ -34,7 +35,7 @@ const SQLHandler = () => {
                 "time_started":"08:00:00"
             };
             console.log('Parsed data:', parsedData); // Log parsed data
-            const response = await fetch('http://localhost:5000/sessions', {
+            const response = await fetch(`http://localhost:${serverPort}/sessions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'text/plain'

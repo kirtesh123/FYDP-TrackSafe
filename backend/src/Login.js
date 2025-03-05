@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
+
 const Login = ({ setIsAuthenticated }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,13 +13,14 @@ const Login = ({ setIsAuthenticated }) => {
   const [error, setError] = useState("");
   const [view, setView] = useState("selection");  // ["Selection", "Login", "registerUser", "registerProvider"]
   const navigate = useNavigate();
+  const serverPort = process.env.REACT_APP_SERVER_PORT;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`http://localhost:${serverPort}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -41,7 +43,7 @@ const Login = ({ setIsAuthenticated }) => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch(`http://localhost:${serverPort}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, phoneNumber, region, carModel }),

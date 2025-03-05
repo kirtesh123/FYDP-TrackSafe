@@ -9,10 +9,12 @@ const mysql = require('mysql');
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.REACT_APP_SERVER_PORT;
+console.log("Port:", port);
+const localPort = process.env.LOCAL_HOST_PORT;
 
 const corsOptions = {
-  origin: '*', //'http://localhost:3000', // Allow only this origin
+  origin: '*', //`http://localhost:${localPort}`, // Allow only this origin
   optionsSuccessStatus: 200,
 };
 

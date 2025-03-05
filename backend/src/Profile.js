@@ -6,6 +6,7 @@ const Profile = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const serverPort = process.env.REACT_APP_SERVER_PORT;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +19,7 @@ const Profile = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/driver?user=${keyID}`);
+        const response = await fetch(`http://localhost:${serverPort}/driver?user=${keyID}`);
         if (!response.ok) {
           throw new Error("Failed to fetch profile data");
         }
@@ -45,7 +46,7 @@ const Profile = () => {
 
   const fetchSessions = async (keyID) => {
     try {
-      const response = await fetch(`http://localhost:5000/sessions?user=${keyID}`);
+      const response = await fetch(`http://localhost:${serverPort}/sessions?user=${keyID}`);
       if (!response.ok) {
         throw new Error("Failed to fetch sessions");
       }
