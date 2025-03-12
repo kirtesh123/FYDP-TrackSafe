@@ -38,6 +38,7 @@ main {
 }
 
 
+
 /* Table Styling */
 .driver-table,
 .session-table {
@@ -141,6 +142,7 @@ main {
   margin-bottom: 20px;
   margin-top: 250px;
 }
+
 
 .stats-row {
   display: flex;

@@ -3,25 +3,23 @@ import "./Profile.css";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const serverPort = process.env.REACT_APP_SERVER_PORT;
-  const userType = localStorage.getItem("userType");  // Define userType at the top level of the component
 
   useEffect(() => {
-    const userID = localStorage.getItem("KeyID") || localStorage.getItem("PID");
-
-    if (!userID) {
-      setError("User not found. Please log in.");
-      setLoading(false);
-      return;
-    }
-
-    const endpoint = userType === "1" ? "/provider" : "/driver"; // Use different endpoint based on userType
-
     const fetchData = async () => {
+      const keyID = localStorage.getItem("KeyID");
+
+      if (!keyID) {
+        setError("User not found. Please log in.");
+        setLoading(false);
+        return; // 🔹 Stop execution if KeyID is missing
+      }
+
       try {
-        const response = await fetch(`http://localhost:${serverPort}${endpoint}?user=${userID}`);
+        const response = await fetch(`http://localhost:${serverPort}/driver?user=${keyID}`);
         if (!response.ok) {
           throw new Error("Failed to fetch profile data");
         }
@@ -33,17 +31,31 @@ const Profile = () => {
           return;
         }
 
-        setUser(result[0]); // Set user data
+        setUser(result[0]); // ✅ Set user data
+        await fetchSessions(keyID); // ✅ Fetch sessions only after profile data is set
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // ✅ Ensure loading state is updated
       }
     };
 
     fetchData();
-  }, [serverPort]);
+  }, []);
+
+  const fetchSessions = async (keyID) => {
+    try {
+      const response = await fetch(`http://localhost:${serverPort}/sessions?user=${keyID}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sessions");
+      }
+      const data = await response.json();
+      setSessions(data);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="error">{error}</p>;
@@ -52,6 +64,9 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-header">
         <img src={user?.profilePic || "/images/profile_img.png"} alt="Profile" className="profile-pic" />
+        <div className="profile-info">
+          <h1>{user?.name}</h1>
+        </div>
       </div>
       <div className="profile-content">
         <div className="user-details">
@@ -60,10 +75,9 @@ const Profile = () => {
           <p><strong>Phone Number:</strong> {user?.phoneNumber}</p>
           <p><strong>Region:</strong> {user?.region}</p>
         </div>
-        {/* Only render Car Details if userType is "0" (user) and not "1" (provider) */}
-        { userType === "0" && (
-          <div className="car-details">
-            <h3>Car Details</h3>
+        <div className="car-details">
+          <h3>Car Details</h3>
+          <div className="car-columns">
             <div className="car-info">
               <p><strong>Model:</strong> {user?.carModel}</p>
               <p><strong>License Plate:</strong> {user?.licensePlate}</p>
@@ -72,7 +86,7 @@ const Profile = () => {
               <img src={user?.carImage || "/images/car_default.png"} alt="Car"/>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
