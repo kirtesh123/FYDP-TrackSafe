@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = ({ setIsAuthenticated, setIsAdmin }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +12,7 @@ const Login = ({ setIsAuthenticated }) => {
   const [carModel, setCarModel] = useState("");
   const [error, setError] = useState("");
   const [view, setView] = useState("selection");  // ["Selection", "Login", "registerUser", "registerProvider"]
+  const [userType, setUserType] = useState(false);
   const navigate = useNavigate();
   const serverPort = process.env.REACT_APP_SERVER_PORT;
 
@@ -29,9 +30,15 @@ const Login = ({ setIsAuthenticated }) => {
       const result = await response.json();
       console.log("Login successful:", result);
       localStorage.setItem("token", result[0].token); // Store auth token
-      localStorage.setItem("KeyID", result[0].KeyID); // Store KeyID of driver
-      console.log("KeyID: ", localStorage.getItem("KeyID"));
+      setUserType(result[0].userType);
+      localStorage.setItem("userType", result[0].userType);
+      if (result[0].userType === "1") {
+        localStorage.setItem("PID", result[0].PID); // Store PID of Provider
+      } else {
+        localStorage.setItem("KeyID", result[0].KeyID); // Store KeyID of Driver
+      }
       setIsAuthenticated(true);
+      setIsAdmin(userType)
       navigate("/"); // Redirect to home page
     } catch (error) {
       setError(error.message);

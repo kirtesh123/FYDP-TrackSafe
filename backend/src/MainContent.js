@@ -5,40 +5,63 @@ import { FaPlay } from 'react-icons/fa';
 
 // Dynamically import CustomGauge with SSR disabled
 const CustomGauge = lazy(() => import('./CustomGauge'));
+const ProviderHome = lazy(() => import('./ProviderHome'));
+
 function MainContent() {
   const [driver, setDriver] = useState({});
+  const [provider, setProvider] = useState({});
+  const [providerKeys, setProviderKeys] = useState([]);
+  const [userType, setUserType] = useState(false);
   const serverPort = process.env.REACT_APP_SERVER_PORT;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const keyID = localStorage.getItem("KeyID");
-        const response = await fetch(`http://localhost:${serverPort}/driver?user=${keyID}`);
-        const result = await response.json();
-        // console.log('Driver Data fetched from API:', result); // Log the fetched data
-        setDriver(result[0] || {});
-        console.log(result)
+        const storedUserType = localStorage.getItem("userType") === "1";
+        setUserType(storedUserType);
+        if (userType) {
+          const PID = localStorage.getItem("PID");
+          const response = await fetch(`http://localhost:${serverPort}/provider?user=${PID}`);
+          const result = await response.json();
+          setProvider(result[0] || {});
+          console.log(result);
+
+          const response2 = await fetch(`http://localhost:${serverPort}/provider-keys?user=${PID}`);
+          const result2 = await response2.json();
+          setProviderKeys(Array.isArray(result2) ? result2 : []);
+          console.log(result2);
+        } else {
+          const keyID = localStorage.getItem("KeyID");
+          const response = await fetch(`http://localhost:${serverPort}/driver?user=${keyID}`);
+          const result = await response.json();
+          // console.log('Driver Data fetched from API:', result); // Log the fetched data
+          setDriver(result[0] || {});
+          console.log(result)
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, []);
-
-  const driverScore = driver.currentScore;
-  console.log("Score: ", driverScore)
-  // const driverScore = driver[0].currentScore;
+  }, [userType]);
 
   return (
     <div className="main-content">
       <Suspense fallback={<div>Loading...</div>}>
-        <CustomGauge driveScore={driverScore} />
+        {userType ? (
+          <ProviderHome providerKeys={providerKeys} />
+        ) : (
+          <>
+            <CustomGauge driveScore={driver.currentScore} />
+            <SessionsToday />
+          </>
+        )} 
       </Suspense>
-      <SessionsToday />
     </div>
   );
 }
+
 
 function SessionsToday() {
   const [sessions, setSessions] = useState([]);
@@ -50,13 +73,16 @@ function SessionsToday() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const keyID = localStorage.getItem("KeyID");
-        const offset = (currentPage - 1) * 5;
-        const response = await fetch(`http://localhost:${serverPort}/sessions?limit=5&offset=${offset}&user=${keyID}`);
-        const result = await response.json();
-        console.log('Sessions Data fetched from API:', result); // Log the fetched data
-        setSessions(result || []);
-        setTotalPages(Math.ceil((result || []).length / 5));
+        const userType = localStorage.getItem("userType") === "1";
+        if (!userType) {
+          const keyID = localStorage.getItem("KeyID");
+          const offset = (currentPage - 1) * 5;
+          const response = await fetch(`http://localhost:${serverPort}/sessions?limit=5&offset=${offset}&user=${keyID}`);
+          const result = await response.json();
+          console.log('Sessions Data fetched from API:', result); // Log the fetched data
+          setSessions(result || []);
+          setTotalPages(Math.ceil((result || []).length / 5));
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -24,7 +24,7 @@ const createTableQuery1 = `
     phoneNumber VARCHAR(12) NOT NULL,
     region VARCHAR(30) NOT NULL,
     carModel VARCHAR(50) NOT NULL,
-    licensePlate VARCHAR() NOT NULL,
+    licensePlate VARCHAR(7) NOT NULL,
     currentScore INT,
     previousScore INT
   )
@@ -32,17 +32,53 @@ const createTableQuery1 = `
 
 // Populate the table with dummy entries
 const insertQuery1 = `
-INSERT INTO Drivers (KeyID, name, password, email, phoneNumber, region, carModel, currentScore, previousScore)
+INSERT INTO Drivers (KeyID, name, password, email, phoneNumber, region, carModel, licensePlate, currentScore, previousScore)
 VALUES
-  (1, 'John Doe', 'password123', 'john@example.com', '1234567890', 'North', 'Toyota Camry', 85, 80),
-  (2, 'Jane Smith', 'password123', 'jane@example.com', '0987654321', 'South', 'Honda Accord', 90, 88),
-  (3, 'Mike Johnson', 'password123', 'mike@example.com', '2345678901', 'East', 'Ford Focus', 75, 78),
-  (4, 'Emily Davis', 'password123', 'emily@example.com', '3456789012', 'West', 'Chevrolet Malibu', 82, 84),
-  (5, 'Chris Brown', 'password123', 'chris@example.com', '4567890123', 'Central', 'Nissan Altima', 88, 85)
+  (1, 'John Doe', 'password123', 'john@example.com', '1234567890', 'North', 'Toyota Camry', 'BZBL696', 85, 80),
+  (2, 'Jane Smith', 'password123', 'jane@example.com', '0987654321', 'South', 'Honda Accord', 'MSCI331', 90, 88),
+  (3, 'Mike Johnson', 'password123', 'mike@example.com', '2345678901', 'East', 'Ford Focus', 'ABCD123', 75, 78),
+  (4, 'Emily Davis', 'password123', 'emily@example.com', '3456789012', 'West', 'Chevrolet Malibu', 'SXFK337', 82, 84),
+  (5, 'Chris Brown', 'password123', 'chris@example.com', '4567890123', 'Central', 'Nissan Altima', 'MCDD999', 88, 85)
+`;
+
+// Create the Providers table
+const createTableQuery2 = `
+CREATE TABLE IF NOT EXISTS Providers (
+  PID INT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  email VARCHAR(50) NOT NULL,
+  password VARCHAR(50) NOT NULL,
+  region VARCHAR(30) NOT NULL
+)
+`;
+
+// Populate the Providers table
+const insertQuery2 = `
+INSERT INTO Providers VALUES
+  (1, 'Admin', 'admin@email.com', 'adminpass', 'Central')
+`;
+
+// Create the ProviderKeyIDs table
+const createTableQuery3 = `
+CREATE TABLE IF NOT EXISTS ProviderKeyIDs (
+  PID INT,
+  KeyID INT,
+  PRIMARY KEY (PID, KeyID),
+  FOREIGN KEY (PID) REFERENCES Providers (PID) ON DELETE CASCADE
+)
+`;
+
+// Populate the ProviderKeyIDs table
+const insertQuery3 = `
+INSERT INTO ProviderKeyIDs VALUES
+  (1, 1),
+  (1, 2),
+  (1, 3),
+  (1, 4),
 `;
 
 // Create the Sessions table
-const createTableQuery2 = `
+const createTableQuery4 = `
 CREATE TABLE IF NOT EXISTS Sessions (
   KeyID INT,
   sessionID INT,
@@ -58,7 +94,7 @@ CREATE TABLE IF NOT EXISTS Sessions (
 `;
 
 // Populate the table with dummy entries
-const insertQuery2 = `
+const insertQuery4 = `
 INSERT INTO Sessions (KeyID, sessionID, time_started, time_ended, proximity_warnings_vehicles, proximity_warnings_pedestrians, speed_violations, eye_movement, traffic_violations)
 VALUES
   (1, 1, '08:00:00', '09:00:00', 2, 1, 0, 50, 1),
@@ -107,14 +143,43 @@ connection.connect((err) => {
         }
         console.log('Data inserted into Drivers table successfully');
 
-        // Create and populate Sessions table after Drivers table is done
         connection.query(createTableQuery2, (err, results, fields) => {
+          if (err) {
+            return console.error('error creating table: ' + err.message);
+          }
+          console.log('Providers table created successfully');
+
+          connection.query(insertQuery2, (err, results, fields) => {
+            if (err) {
+                return console.error('error inserting data: ' + err.message);
+            }
+            console.log('Data inserted into Providers table successfully');
+
+            connection.query(createTableQuery3, (err, results, fields) => {
+              if (err) {
+                return console.error('error creating table: ' + err.message);
+              }
+              console.log('ProviderKeyIDs table created successfully');
+    
+              connection.query(insertQuery3, (err, results, fields) => {
+                if (err) {
+                    return console.error('error inserting data: ' + err.message);
+                }
+                console.log('Data inserted into ProviderKeyIDs table successfully');
+              });
+            });
+
+          });
+        });
+
+        // Create and populate Sessions table after Drivers table is done
+        connection.query(createTableQuery4, (err, results, fields) => {
             if (err) {
             return console.error('error creating table: ' + err.message);
             }
             console.log('Sessions table created successfully');
 
-            connection.query(insertQuery2, (err, results, fields) => {
+            connection.query(insertQuery4, (err, results, fields) => {
             if (err) {
                 return console.error('error inserting data: ' + err.message);
             }

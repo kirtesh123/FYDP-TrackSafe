@@ -11,14 +11,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   // State to track if the user is authenticated (has a token stored)
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+  const [isAdmin, setIsAdmin] = useState(!!localStorage.getItem("userType"));
 
   // Effect to check authentication status when the app loads or refreshes
   useEffect(() => {
     // Get the stored token
     const token = localStorage.getItem("token");
+    const userType = localStorage.getItem("userType");
 
     // Convert token existence to boolean
     setIsAuthenticated(!!token);
+    setIsAdmin(!!userType);
   }, []);
 
   // Function to dynamically change the background
@@ -48,7 +51,7 @@ const BackgroundSetter = () => {
             {/* Main Content on Home */}
             <Route path="/" element={isAuthenticated ? <MainContent /> : <Navigate to="/login" />} />  
             {/* Profile Page Route */}
-            <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login setIsAuthenticated={setIsAuthenticated} />} />  
+            <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login setIsAuthenticated={setIsAuthenticated} setIsAdmin={setIsAdmin} />} />  
             {/* Login Page  */}
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} /> 
           </Routes>

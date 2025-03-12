@@ -3,7 +3,7 @@ body, html {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 /* Fix Navbar Overlapping */
@@ -39,6 +39,7 @@ main {
 
 
 /* Table Styling */
+.driver-table,
 .session-table {
   width: 100%;
   background: white;
@@ -49,17 +50,20 @@ main {
   overflow: hidden;
 }
 
+.driver-table th, .driver-table td,
 .session-table th, .session-table td {
   padding: 12px;
   text-align: center;
   border-bottom: 1px solid #ddd;
 }
 
+.driver-table th,
 .session-table th {
   background: #f8f9fa;
   font-weight: bold;
 }
 
+.driver-table tr:hover,
 .session-table tr:hover {
   background: rgba(0, 0, 0, 0.05);
 }
@@ -69,6 +73,7 @@ main {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  margin-top: 50px;
   color: black;
 }
 
@@ -127,4 +132,30 @@ main {
   .score-label {
     font-size: 16px;
   }
+}
+
+.statistics-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  margin-top: 55vh;
+}
+
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stat-box {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 150px;
+}
+
+.chart-container {
+  margin-top: 20px;
 }

@@ -179,6 +179,46 @@ app.get('/driver', (req, res) => {
   });
 });
 
+// Endpoint to get provider data
+app.get('/provider', (req, res) => {
+  let user = parseInt(req.query.user, 10);
+  let email = req.query.email;
+  let password = req.query.password;
+  if (isNaN(user) || user <= 0) {
+    user = null; // Handle invalid or missing limit
+  }
+  const query = 'SELECT * FROM Providers' + (user?` WHERE PID = ${user}`: (email && password) ? `WHERE email = ${email} AND password = ${password}` : '');
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Server error');
+      return;
+    }
+    console.log('Data fetched from database:', results); // Log the fetched data
+    res.json(results);
+  });
+});
+
+// Endpoint to get list of drivers for Provider
+app.get('/provider-keys', (req, res) => {
+  let user = parseInt(req.query.user, 10);
+  let email = req.query.email;
+  let password = req.query.password;
+  if (isNaN(user) || user <= 0) {
+    return res.status(500).json({ message: 'Missing PID'});
+  }
+  const query = `SELECT * FROM Drivers d JOIN ProviderKeyIDs p ON d.KeyID = p.KeyID WHERE PID = ${user}`;
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      res.status(500).send('Server error');
+      return;
+    }
+    console.log('Data fetched from database:', results); // Log the fetched data
+    res.json(results);
+  });
+});
+
 // Endpoint to insert new session
 app.post('/sessions', (req, res) => {
   const data = req.body;
@@ -321,14 +361,35 @@ app.post('/login', (req, res) => {
   if (!password || password.trim().length=== 0) {
     return res.status(400).json({ error: 'Password is required' });
   }
-  const query = `SELECT * FROM Drivers WHERE email = ? AND password = ?`;
+  const query = `SELECT * FROM Providers WHERE email = ? AND password = ?`;
+  const query2 = `SELECT * FROM Drivers WHERE email = ? AND password = ?`;
   db.query(query, [email.trim(), password.trim()], (err, results) => {
     if (err) {
       console.error('Error executing query:', err);
-      res.status(500).send('Server error');
-      return;
+      return res.status(500).send('Server error');
     }
-    results[0].token = "1";
-    res.json(results);
+    // No Providers matched
+    if (results.length === 0) {
+      db.query(query2, [email.trim(), password.trim()], (err2, results2) => {
+        if (err2) {
+          console.error('Error executing query2:', err2);
+          return res.status(500).send('Server error');
+        }
+  
+        // If a match is found in Drivers, add the token and send response
+        if (results2.length > 0) {
+          results2[0].token = "1";
+          results2[0].userType = "0";
+          return res.json(results2); // Send the matched result from Drivers
+        } else {
+          return res.status(404).send('No user found'); // No match found in either table
+        }
+      });
+    } else {
+      // If a match is found in Providers, add the token and send response
+      results[0].token = "1"; 
+      results[0].userType = "1";
+      return res.json(results); // Send the matched result from Providers
+    }
   });
 });
