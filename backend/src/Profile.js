@@ -54,24 +54,36 @@ const Profile = () => {
         <img src={user?.profilePic || "/images/profile_img.png"} alt="Profile" className="profile-pic" />
       </div>
       <div className="profile-content">
-        <div className="user-details">
-          <h3>User Details</h3>
-          <p><strong>Email:</strong> {user?.email}</p>
-          <p><strong>Phone Number:</strong> {user?.phoneNumber}</p>
-          <p><strong>Region:</strong> {user?.region}</p>
-        </div>
         {/* Only render Car Details if userType is "0" (user) and not "1" (provider) */}
-        { userType === "0" && (
-          <div className="car-details">
-            <h3>Car Details</h3>
-            <div className="car-info">
-              <p><strong>Model:</strong> {user?.carModel}</p>
-              <p><strong>License Plate:</strong> {user?.licensePlate}</p>
-            </div>
-            <div className="car-image">
-              <img src={user?.carImage || "/images/car_default.png"} alt="Car"/>
-            </div>
+        { userType === "1" ? (
+          <div className="user-details">
+            <h3>User Details</h3>
+            <p><strong>Name:</strong> {user?.name}</p>
+            <p><strong>Email:</strong> {user?.email}</p>
+            <p><strong>Region:</strong> {user?.region}</p>
           </div>
+          ) : (
+          <>
+            <div className="user-details">
+              <h3>User Details</h3>
+              <p><strong>Name:</strong> {user?.name}</p>
+              <p><strong>Email:</strong> {user?.email}</p>
+              <p><strong>Phone Number:</strong> {user?.phoneNumber}</p>
+              <p><strong>Region:</strong> {user?.region}</p>
+            </div>
+              <div className="car-details">
+                <h3>Car Details</h3>
+                <div className="car-columns">
+                  <div className="car-info">
+                    <p><strong>Model:</strong> {user?.carModel}</p>
+                    <p><strong>License Plate:</strong> {user?.licensePlate}</p>
+                  </div>
+                  <div className="car-image">
+                    <img src={user?.carImage || "/images/car_default.png"} alt="Car"/>
+                  </div>
+                </div>
+              </div>
+            </>
         )}
       </div>
     </div>
